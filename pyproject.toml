@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mavsniff"
+version = "1.0.0"
+authors = [
+  { name="Tomas Peterka", email="tomas.peterka@dronetag.cz" },
+]
+description = "Mavsniff enables you to capture and replay MAVLink communication over serial line or network"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    'click',
+    'pymavlink',
+    'pyserial',
+    'python-pcapng',
+]
+
+[project.urls]
+Homepage = "https://github.com/dronetag/mavsniff"
+Issues = "https://github.com/dronetag/mavsniff/issues"
+
+[project.scripts]
+mavsniff = "mavsniff:__main__"
+
+[project.optional-dependencies]
+dev = ['build', "wheel", 'pytest']
+
+[[tool.poetry.source]]
+name = "dronetag"
+url = "https://pypi.dronetag.cz"
+secondary = true
