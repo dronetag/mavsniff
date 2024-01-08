@@ -31,7 +31,8 @@ def mavlink(uri:str, input:bool, version:int=2, dialect:str=None, **kwargs) -> m
     logger.debug(f"creating mavlink device: {uri}")
     m = mavutil.mavlink_connection(uri, input=input, dialect=dialect, **clean(kwargs))
     if m is None:
-        return None
+        raise RuntimeError(f"failed to create mavlink device: {uri}")
+    return m
 
 
 def clean(kwargs:dict) -> dict:
