@@ -13,17 +13,27 @@ Mavsniff is distributed via PYPI and an entrypoint `mavsniff` should be availabl
 ## Usage
 
 ```bash
-$ mavsniff capture --device udp://localhost:5467 --file recording  # will append .pcapng to the file name autom7y
-$ mavsniff replay -f recording -d /dev/ttyS0 --baud=57600 # for serial line, specify baud if different from 115200
+$ mavsniff capture --device udp://localhost:5467 --file recording --mavlink-dialect path-to-custom/my-dialect.xml
+$ mavsniff replay -f recording -d /dev/ttyS0 -m my-dialect --baud=57600 # for serial line, specify baud if different from 115200
 $ mavsniff ports # show available serial ports
 $ mavsniff wsplugin # install Wireshark MAVlink disector plugin for reading Mavlink packets
 ```
 
-Available device urls:
+### Devices
+
  * `-d /dev/ttyS0` - standard serial port on UNIX systems
  * `-d COMx` - from COM1 to COM8 - standard serial ports on Windows systems
  * `-d udp://<host>:<port>` or `tcp://<host>:<port>` - receive or send packets over network (TCP or UDP)
  * currently, there is no option how to **send** MAVLink packets over the network.
+
+### Dialects
+
+Default dialect is **arduinomega** and version is **2.0**. You can specify your custom dialect in form
+of mavlink's XML definition via `--mavlink-dialect/-m` flag. Mavsniff will copy your XML into internal
+pymavlink folder and compile it on the first run. All subsequent runs won't update nor recompile your 
+dialect. Once your custom dialect was imported and compiled, you can reference by its name (XML filename
+without extension).
+
 
 ### Using with network
 
