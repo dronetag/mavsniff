@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mavsniff"
-version = "1.0.0"
+version = "0.0.1"
 authors = [
   { name="Tomas Peterka", email="tomas.peterka@dronetag.cz" },
 ]
@@ -31,9 +31,4 @@ Issues = "https://github.com/dronetag/mavsniff/issues"
 mavsniff = "mavsniff:__main__"
 
 [project.optional-dependencies]
-dev = ['build', "wheel", 'pytest']
-
-[[tool.poetry.source]]
-name = "dronetag"
-url = "https://pypi.dronetag.cz"
-secondary = true
+dev = ['build', "wheel", 'pytest', 'twine']

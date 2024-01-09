@@ -13,8 +13,8 @@ as_pcapng = lambda f: f if "." in f else f + ".pcapng"
 @click.option("--device", "-d", required=True, help="device URI (/dev/tty..., COMx on windows or udp://host:port, tcp://host:port))")
 @click.option("--limit", "-l", default=-1, type=int, help="limit the number of read/written packets (default -1 unlimited)")
 @click.option("--verbose", "-v", is_flag=True, default=False, help="enable debug logging")
-@click.option("--mavlink-version", "-m", type=int, default=2, help="Set mavlink protocol version (options: 1,2; default: 2)")
-@click.option("--mavlink-dialect", "-n", help="Mavlink dialect (see pymavlink.dialects for possible values)")
+@click.option("--mavlink-dialect", "-m", help="Mavlink dialect (see pymavlink.dialects for possible values)")
+@click.option("--mavlink-version", "-n", type=int, default=2, help="Set mavlink protocol version (options: 1,2; default: 2)")
 @click.option("--baud", "-b", type=int, help="Serial communication baud rate")
 def capture(device:str, file:str, limit:int, verbose:bool, mavlink_version:int, mavlink_dialect:str, **kwargs):
     """Capture mavlink communication from a serial device and store it into a pcapng file"""
@@ -24,15 +24,21 @@ def capture(device:str, file:str, limit:int, verbose:bool, mavlink_version:int, 
     try:
         pcapfile = open(as_pcapng(file), "wb")
     except Exception as e:
-        logger.error(f"Failed to open file {file}: {e}")
+        if verbose:
+            logger.exception(e)
+        else:
+            logger.error(f"Failed to open file {file}: {e}")
         return 1
 
     mavconn = None
     try:
         mavconn = mavlink(device, input=True, version=mavlink_version, dialect=mavlink_dialect, **kwargs)
     except Exception as e:
-        file.close()
-        logger.error(f"Failed to open file {file}: {e}")
+        pcapfile.close()
+        if verbose:
+            logger.exception(e)
+        else:
+            logger.error(str(e))
         return 1
 
     try:

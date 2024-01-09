@@ -20,7 +20,10 @@ def replay(file, device, verbose, limit) -> int:
     try:
         pcapfile = open(as_pcapng(file), "rb")
     except Exception as e:
-        logger.error(f"Failed to open file {file}: {e}")
+        if verbose:
+            logger.exception(e)
+        else:
+            logger.error(f"Failed to open file {file}: {e}")
         return 1
 
     mavconn = None
@@ -28,7 +31,10 @@ def replay(file, device, verbose, limit) -> int:
         mavconn = mavlink(device, input=True)
     except Exception as e:
         pcapfile.close()
-        logger.error(f"Failed to open file {file}: {e}")
+        if verbose:
+            logger.exception(e)
+        else:
+            logger.error(str(e))
         return 1
 
     try:
