@@ -1,4 +1,4 @@
-name: Delivery
+name: Release
 
 on:
   workflow_dispatch:
