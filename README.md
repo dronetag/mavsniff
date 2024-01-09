@@ -39,14 +39,8 @@ Start developing by cloning the repo and installing tha application locally
 
 ```bash
 $ git clone git@github.com:katomaso/mavsniff.git && cd mavsniff
-$ python -m venv .venv
-$ pip install -e .[dev]  # to install even the extra dev dependencies
-```
-
-After developing new features, run tests and build and publish new package
-
-```bash
-$ pytest
-$ python3 -m build
-$ python -m twine upload dist/*
+$ python -m venv .venv && source $VENV
+$ pip install poetry
+$ poetry install -E dev
+$ poetry run pytest
 ```
