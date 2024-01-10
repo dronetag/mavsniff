@@ -26,9 +26,14 @@ pyserial = "^3.5"
 python-pcapng = "^2.1.1"
 pytest = {version="*", optional=true}
 wheel = {version="*", optional=true}
+mypy = {version="*", optional=true}
+pyflakes = {version="*", optional=true}
 
 [tool.poetry.scripts]
 mavsniff = "mavsniff:__main__"
 
 [tool.poetry.extras]
-dev = ["wheel", 'pytest']
+dev = ["wheel", "pytest", "mypy", "pyflakes"]
+
+[tool.mypy]
+follow_imports = "skip"

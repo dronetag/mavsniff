@@ -1,10 +1,10 @@
 import io
-import pcapng
+import pcapng  # type: ignore[import-untyped]
 import signal
 import threading
 import time
 
-from pymavlink import mavutil
+from pymavlink import mavutil  # type: ignore[import-untyped]
 
 from mavsniff.utils.log import logger
 from mavsniff.utils import ip
@@ -16,7 +16,11 @@ SECTION_MAGIC = 0x0A0D0D0A
 
 
 class Replay:
-    def __init__(self, device: mavutil.mavfile, file: io.BytesIO):
+    file: io.BufferedReader
+    device: mavutil.mavfile
+    done: bool
+
+    def __init__(self, file: io.BufferedReader, device: mavutil.mavfile):
         self.file = file
         self.device = device
         self.done = False

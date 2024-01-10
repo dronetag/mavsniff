@@ -1,5 +1,5 @@
 import click
-import serial.tools.list_ports as list_ports
+import serial.tools.list_ports as list_ports  # type: ignore[import-untyped]
 
 
 def elipsis(string, length):

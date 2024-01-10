@@ -1,11 +1,11 @@
 import click
 import os.path
 import sys
-import pymavlink
+import pymavlink  # type: ignore[import-untyped]
 
 from datetime import datetime
 from pathlib import Path
-from pymavlink.generator import mavgen, mavparse
+from pymavlink.generator import mavgen, mavparse  # type: ignore[import-untyped]
 
 """
 Build and install Mavlink plugin for Wireshark
@@ -73,7 +73,7 @@ def wsplugin(dialects, version, wireshark_plugin_dir, override, delete) -> int:
         click.echo(f"[INFO] Found existing {plugin_file}")
         if version_file.exists():
             click.echo(version_file.read_text())
-        click.echo(f"[ERROR] Use --override to overwrite it")
+        click.echo("[ERROR] Use --override to overwrite it")
         return 1
 
     opts = mavgen.Opts(plugin_name, wire_protocol=version, language="wlua")
@@ -92,3 +92,4 @@ Built at: {datetime.now()}
 Dialects: {dialects}
 """)
     click.echo(f"Created {plugin_file}")
+    return 0

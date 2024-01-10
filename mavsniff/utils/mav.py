@@ -3,8 +3,8 @@ import sys
 
 from pathlib import Path
 
-from pymavlink import mavutil
-from pymavlink.generator import mavparse, mavgen
+from pymavlink import mavutil  # type: ignore[import-untyped]
+from pymavlink.generator import mavparse, mavgen  # type: ignore[import-untyped]
 
 from .log import logger
 
@@ -13,7 +13,7 @@ ParseError = mavparse.MAVParseError
 # HACK: fixup - do not fill RAM with mavlink messages when sniffing
 mavutil.add_message = lambda messages, mtype, msg: None
 
-def mavlink(uri:str, input:bool, dialect:str=None, version:int=2, **kwargs) -> mavutil.mavfile:
+def mavlink(uri:str, input:bool, dialect:str="ardupilotmega", version:int=2, **kwargs) -> mavutil.mavfile:
     """
     Create mavlink IO device
     @param uri: device path (e.g. udp://localhost:14445, tcp://localhost:14550, /dev/ttyUSB0, /dev/ttyS0, COM1...)
@@ -76,7 +76,7 @@ def check_or_install_dialect(dialect: str, version: int) -> str:
 def install_dialect(dialect: str, version: int) -> Path:
     """Install dialect XML definition into Pymavlink's internal directory"""
     dialect_path = Path(dialect)
-    dialect_root_dir = Path(mavgen.__file__).parent.parent / "dialects" / "v20" if version == 2 else "v10"
+    dialect_root_dir = Path(mavgen.__file__).parent.parent / "dialects" / ("v20" if version == 2 else "v10")
     if dialect_path.parent == dialect_root_dir:
         raise RuntimeError("Do not specify dialect as a full path to pymavlink's internal directory. Use alias (name) instead.")
 
@@ -113,5 +113,5 @@ def build_dialect(xml_path: Path) -> str:
 
 def list_dialects(version: int) -> list:
     """List all installed dialects"""
-    dialect_root_dir = Path(mavgen.__file__).parent.parent / "dialects" / "v20" if version == 2 else "v10"
+    dialect_root_dir = Path(mavgen.__file__).parent.parent/ "dialects" / ("v20" if version == 2 else "v10")
     return [d.stem for d in dialect_root_dir.glob("*.py") if d.stem != "__init__"]

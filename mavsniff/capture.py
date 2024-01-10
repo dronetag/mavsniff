@@ -1,15 +1,15 @@
 import io
-import pcapng
-import serial
-import time
-import struct
-
+import pcapng  # type: ignore[import-untyped]
+import serial  # type: ignore[import-untyped]
 import signal
+import struct
 import time
 import threading
 
-from pymavlink import mavutil
-from pymavlink.generator import mavparse
+
+
+from pymavlink import mavutil  # type: ignore[import-untyped]
+from pymavlink.generator import mavparse  # type: ignore[import-untyped]
 
 from mavsniff.utils.log import logger
 from mavsniff.utils.ip import udp_header
@@ -17,16 +17,19 @@ from mavsniff.utils.ip import udp_header
 
 class Capture:
     """Capture reads Mavlink messages from a device and store them into a PCAPNG file"""
+    file: io.BufferedWriter
+    device: mavutil.mavfile
+    writer: pcapng.FileWriter
+    done: bool
 
-    def __init__(self, device: mavutil.mavfile, file: io.BytesIO):
+    def __init__(self, device: mavutil.mavfile, file: io.BufferedWriter):
         self.device = device
         self.file = file
-        self.interface_id=0x00
         self.done = False
         self.sbh = pcapng.blocks.SectionHeader(msgid=0, endianness="<", options={
             'shb_userappl': 'mavsniff',
         })
-        self.sbh.register_interface(pcapng.blocks.InterfaceDescription(msdgid=0x01, endianness="<", interface_id=self.interface_id, section=self.sbh, options={
+        self.sbh.register_interface(pcapng.blocks.InterfaceDescription(msdgid=0x01, endianness="<", interface_id=0x00, section=self.sbh, options={
             'if_name': device.address if ":" not in device.address else device.address.split(":")[1],
             'if_txspeed': getattr(self.device, "baudrate", 0),
             'if_rxspeed': getattr(self.device, "baudrate", 0),
@@ -35,7 +38,7 @@ class Capture:
         }))
         signal.signal(signal.SIGINT, self.stop)
 
-    def run(self, limit=-1, limit_invalid_packets=-1) -> dict:
+    def run(self, limit=-1, limit_invalid_packets=-1) -> int:
         """Store Mavlink messages into a PCAPNG file"""
         self.writer = pcapng.FileWriter(self.file, self.sbh)
         self.done = False
@@ -82,7 +85,7 @@ class Capture:
         payload = udp_header(seq, len(data)) + data
         self.writer.write_block(pcapng.blocks.EnhancedPacket(
             section=self.sbh,
-            interface_id=self.interface_id,
+            interface_id=0x00,
             packet_data=payload,
             timestamp_high=(now_us & 0xFFFFFFFF00000000) >> 32,
             timestamp_low=(now_us & 0xFFFFFFFF),
