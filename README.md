@@ -1,5 +1,8 @@
 # mavsniff
 
+![Licence Badge](https://badgen.net/badge/License/MIT/blue)
+![Coverage Badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/katomaso/bda1e64c276a6d6e6a4e65fb5dc9330b/raw/coverage.json)
+
 Capture and replay MAVLink packets from your drone or GCS. Works on Linux and Windows.
 
 You can read from a serial line (_/dev/ttyXXX or COMx_) or even from network (TCP and UDP). Mavsniff stores packets in pcapng format so you can analyse them with Wireshark.

@@ -24,9 +24,28 @@ jobs:
           python-version: "${{ env.PYTHON_VERSION }}"
       - name: Install DEV dependencies
         run: poetry install -E dev
-      - name: Run tests
-        run: poetry run pytest
       - name: Run mypy typechecks
         run: poetry run mypy mavsniff
       - name: Run flake linter
         run: poetry run pyflakes mavsniff
+      - name: Run tests
+        run: poetry run pytest
+
+      - name: Run coverage test and generate badge
+        run: poetry run pytest --cov=mavsniff > ./pytest-coverage.txt
+      - name: Extract coverage information
+        id: coverage
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          pytest-coverage-path: ./pytest-coverage.txt
+      - name: Create the Badge
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        uses: schneegans/dynamic-badges-action@v1.6.0
+        with:
+          auth: ${{ secrets.GIST_UPDATE_TOKEN }}
+          gistID: bda1e64c276a6d6e6a4e65fb5dc9330b
+          filename: coverage.json
+          label: Test coverage
+          message: ${{ steps.coverage.outputs.coverage }}
+          color: ${{ steps.coverage.outputs.color }}
+          namedLogo: python

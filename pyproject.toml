@@ -25,6 +25,7 @@ pymavlink = "^2.4.20"
 pyserial = "^3.5"
 python-pcapng = "^2.1.1"
 pytest = {version="*", optional=true}
+pytest-cov = {version="*", optional=true}
 wheel = {version="*", optional=true}
 mypy = {version="*", optional=true}
 pyflakes = {version="*", optional=true}
@@ -33,7 +34,13 @@ pyflakes = {version="*", optional=true}
 mavsniff = "mavsniff:__main__"
 
 [tool.poetry.extras]
-dev = ["wheel", "pytest", "mypy", "pyflakes"]
+dev = ["wheel", "pytest", "pytest-cov", "mypy", "pyflakes"]
 
 [tool.mypy]
 follow_imports = "skip"
+
+[tool.coverage.run]
+omit = [
+  "mavsniff/__main__.py",
+  "mavsniff/commands/*",
+]
