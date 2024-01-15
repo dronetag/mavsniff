@@ -30,14 +30,17 @@ def mavlink(uri:str, input:bool, dialect:str="ardupilotmega", version:int=2, **k
         if uri.startswith("udp:"):
             uri = "udpout:" + uri[4:]
 
-    if "://" in uri: # allow people to write URL-like paths
-        uri = ":".join(uri.split("://", 1)) # pymavlink expects `udp:localhost:14550` instead of `udp://localhost:14550`
+    # we allow people to write URL-like paths but pymavlink expects
+    # `udp:localhost:14550` instead of `udp://localhost:14550`
+    if '://' in uri:
+        uri = ':'.join(uri.split('://', 1))
 
     dialect = check_or_install_dialect(dialect, version)
 
     logger.debug(f"setting dialect {dialect} and version {version}")
     if version == 2:
-        os.environ['MAVLINK20'] = "yez" # bacuse mavutil.set_dialect uses solely this to determine the version
+        # mavutil.set_dialect uses only existence of this env var to determine the version
+        os.environ['MAVLINK20'] = 'yez'
     else:
         del os.environ['MAVLINK20']
     mavutil.set_dialect(dialect)
@@ -76,9 +79,11 @@ def check_or_install_dialect(dialect: str, version: int) -> str:
 def install_dialect(dialect: str, version: int) -> Path:
     """Install dialect XML definition into Pymavlink's internal directory"""
     dialect_path = Path(dialect)
-    dialect_root_dir = Path(mavgen.__file__).parent.parent / "dialects" / ("v20" if version == 2 else "v10")
+    mavlink_root = Path(mavgen.__file__).parent.parent
+    dialect_root_dir = mavlink_root / "dialects" / ("v20" if version == 2 else "v10")
     if dialect_path.parent == dialect_root_dir:
-        raise RuntimeError("Do not specify dialect as a full path to pymavlink's internal directory. Use alias (name) instead.")
+        raise RuntimeError("Do not specify dialect as a full path to pymavlink's "
+                           "internal directory. Use alias (name) instead.")
 
     # install XML definition and build a python module from it
     dialect_target_path = dialect_root_dir / dialect_path.name
@@ -113,5 +118,6 @@ def build_dialect(xml_path: Path) -> str:
 
 def list_dialects(version: int) -> list:
     """List all installed dialects"""
-    dialect_root_dir = Path(mavgen.__file__).parent.parent/ "dialects" / ("v20" if version == 2 else "v10")
+    mavlink_root = Path(mavgen.__file__).parent.parent
+    dialect_root_dir = mavlink_root / "dialects" / ("v20" if version == 2 else "v10")
     return [d.stem for d in dialect_root_dir.glob("*.py") if d.stem != "__init__"]

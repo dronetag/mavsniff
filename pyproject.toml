@@ -27,14 +27,17 @@ python-pcapng = "^2.1.1"
 pytest = {version="*", optional=true}
 pytest-cov = {version="*", optional=true}
 wheel = {version="*", optional=true}
+pre-commit = {version="*", optional=true}
 mypy = {version="*", optional=true}
+black = {version="*", optional=true}
+isort = {version="*", optional=true}
 pyflakes = {version="*", optional=true}
 
 [tool.poetry.scripts]
 mavsniff = "mavsniff:__main__"
 
 [tool.poetry.extras]
-dev = ["wheel", "pytest", "pytest-cov", "mypy", "pyflakes"]
+dev = ["wheel", "pytest", "pytest-cov", "mypy", "black", "isort", "pyflakes", "pre-commit"]
 
 [tool.mypy]
 follow_imports = "skip"
@@ -44,3 +47,7 @@ omit = [
   "mavsniff/__main__.py",
   "mavsniff/commands/*",
 ]
+
+[tool.black]
+line-length = 120
+include = "mavsniff"

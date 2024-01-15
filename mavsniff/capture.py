@@ -26,13 +26,13 @@ class Capture:
         self.device = device
         self.file = file
         self.done = False
-        self.sbh = pcapng.blocks.SectionHeader(msgid=0, endianness="<", options={
+        self.sbh = pcapng.blocks.SectionHeader(msgid=0, endianness='<', options={
             'shb_userappl': 'mavsniff',
         })
-        self.sbh.register_interface(pcapng.blocks.InterfaceDescription(msdgid=0x01, endianness="<", interface_id=0x00, section=self.sbh, options={
-            'if_name': device.address if ":" not in device.address else device.address.split(":")[1],
-            'if_txspeed': getattr(self.device, "baudrate", 0),
-            'if_rxspeed': getattr(self.device, "baudrate", 0),
+        self.sbh.register_interface(pcapng.blocks.InterfaceDescription(msdgid=0x01, endianness='<', interface_id=0x00, section=self.sbh, options={
+            'if_name': device.address if ':' not in device.address else device.address.split(':')[1],
+            'if_txspeed': getattr(self.device, 'baudrate', 0),
+            'if_rxspeed': getattr(self.device, 'baudrate', 0),
             'if_tsresol': struct.pack('<B', 6), # negative power of 10
             # should we deal with timestamp resolution?
         }))
@@ -91,7 +91,7 @@ class Capture:
             timestamp_low=(now_us & 0xFFFFFFFF),
             captured_len=len(payload),
             packet_len=len(payload),
-            endianness="<",
+            endianness='<',
             # options={
             #     'epb_flags': 0,
             #     'epb_tsresol': 6, # negative power of 10

@@ -3,6 +3,7 @@ import os.path
 import sys
 import pymavlink  # type: ignore[import-untyped]
 
+from mavsniff.utils import mav
 from datetime import datetime
 from pathlib import Path
 from pymavlink.generator import mavgen, mavparse  # type: ignore[import-untyped]
@@ -65,9 +66,9 @@ def wsplugin(dialects, version, wireshark_plugin_dir, override, delete) -> int:
         return 0
 
     if not dialects:
-        dialects = ("all",)
-        click.echo(f"[INFO] No dialects specified, using: {dialects}")
-        click.echo("[INFO] Available dialects: all, ardupilotmega, ASLUAV, AVSSUAS, common, csAirLink, cubepilot, development, icarous, loweheiser, matrixpilot, minimal, paparazzi, python_array_test, standard, storm32, test, ualberta, uAvionix")
+        dialects = ('ardupilotmega', )
+        click.echo(f'[INFO] No dialects specified, using: {dialects}')
+        click.echo(f'[INFO] Available dialects: {mav.list_dialects(version)}')
 
     if plugin_file.exists() and not override:
         click.echo(f"[INFO] Found existing {plugin_file}")
