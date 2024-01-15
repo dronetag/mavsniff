@@ -21,7 +21,7 @@ repos:
       types: [python]
     - id: isort
       name: isort
-      entry: poetry run isort --check-only
+      entry: poetry run isort --profile black --check-only
       language: system
       types: [python]
     - id: signoff-commits

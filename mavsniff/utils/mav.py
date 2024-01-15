@@ -1,10 +1,9 @@
 import os
 import sys
-
 from pathlib import Path
 
-from pymavlink import mavutil  # type: ignore[import-untyped]
-from pymavlink.generator import mavparse, mavgen  # type: ignore[import-untyped]
+from pymavlink import mavutil
+from pymavlink.generator import mavgen, mavparse
 
 from .log import logger
 
@@ -13,13 +12,14 @@ ParseError = mavparse.MAVParseError
 # HACK: fixup - do not fill RAM with mavlink messages when sniffing
 mavutil.add_message = lambda messages, mtype, msg: None
 
-def mavlink(uri:str, input:bool, dialect:str="ardupilotmega", version:int=2, **kwargs) -> mavutil.mavfile:
+
+def mavlink(uri: str, input: bool, dialect: str = "ardupilotmega", version: int = 2, **kwargs) -> mavutil.mavfile:
     """
     Create mavlink IO device
     @param uri: device path (e.g. udp://localhost:14445, tcp://localhost:14550, /dev/ttyUSB0, /dev/ttyS0, COM1...)
     @param dialect: MAVLink dialect (all, ardupilotmega, common, pixhawk...) @see pymavlink.dialects for more
     """
-    if input: # the names for input and output are not consistent in pymavlink
+    if input:  # the names for input and output are not consistent in pymavlink
         if uri.startswith("tcp:"):
             uri = "tcpin:" + uri[6:]
         if uri.startswith("udp:"):
@@ -32,17 +32,17 @@ def mavlink(uri:str, input:bool, dialect:str="ardupilotmega", version:int=2, **k
 
     # we allow people to write URL-like paths but pymavlink expects
     # `udp:localhost:14550` instead of `udp://localhost:14550`
-    if '://' in uri:
-        uri = ':'.join(uri.split('://', 1))
+    if "://" in uri:
+        uri = ":".join(uri.split("://", 1))
 
     dialect = check_or_install_dialect(dialect, version)
 
     logger.debug(f"setting dialect {dialect} and version {version}")
     if version == 2:
         # mavutil.set_dialect uses only existence of this env var to determine the version
-        os.environ['MAVLINK20'] = 'yez'
+        os.environ["MAVLINK20"] = "yez"
     else:
-        del os.environ['MAVLINK20']
+        del os.environ["MAVLINK20"]
     mavutil.set_dialect(dialect)
 
     logger.debug(f"creating mavlink device: {uri}")
@@ -52,7 +52,7 @@ def mavlink(uri:str, input:bool, dialect:str="ardupilotmega", version:int=2, **k
     return m
 
 
-def clean(kwargs:dict) -> dict:
+def clean(kwargs: dict) -> dict:
     """Remove None values from a dictionary"""
     return {k: v for k, v in kwargs.items() if v is not None}
 
@@ -72,7 +72,7 @@ def check_or_install_dialect(dialect: str, version: int) -> str:
 
     available_dialects = list_dialects(version)
     if dialect not in available_dialects:
-        raise RuntimeError(f"Unknown dialect \"{dialect}\", available dialects: {available_dialects}")
+        raise RuntimeError(f'Unknown dialect "{dialect}", available dialects: {available_dialects}')
     return dialect
 
 
@@ -82,8 +82,9 @@ def install_dialect(dialect: str, version: int) -> Path:
     mavlink_root = Path(mavgen.__file__).parent.parent
     dialect_root_dir = mavlink_root / "dialects" / ("v20" if version == 2 else "v10")
     if dialect_path.parent == dialect_root_dir:
-        raise RuntimeError("Do not specify dialect as a full path to pymavlink's "
-                           "internal directory. Use alias (name) instead.")
+        raise RuntimeError(
+            "Do not specify dialect as a full path to pymavlink's " "internal directory. Use alias (name) instead."
+        )
 
     # install XML definition and build a python module from it
     dialect_target_path = dialect_root_dir / dialect_path.name
@@ -108,8 +109,9 @@ def build_dialect(xml_path: Path) -> str:
 
     installed = mavgen.mavgen_python_dialect(
         py_path.stem,
-        mavparse.PROTOCOL_2_0 if "v20" in str(xml_path) else mavparse.PROTOCOL_1_0,
-        sys.version_info.major == 3)
+        wire_protocol=mavparse.PROTOCOL_2_0 if "v20" in str(xml_path) else mavparse.PROTOCOL_1_0,
+        with_type_annotations=sys.version_info.major == 3,
+    )
 
     if not installed:
         raise RuntimeError(f"Failed to install (compile) dialect {py_path.stem}")

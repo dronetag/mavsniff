@@ -4,7 +4,7 @@ import serial.tools.list_ports as list_ports
 
 def elipsis(string, length):
     if len(string) > length:
-        return string[:length - 3] + "..."
+        return string[: length - 3] + "..."
     return string
 
 

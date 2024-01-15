@@ -50,4 +50,7 @@ omit = [
 
 [tool.black]
 line-length = 120
-include = "mavsniff"
+# black excludes .git,.venv and others by default
+
+[tool.isort]
+profile = "black"

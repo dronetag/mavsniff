@@ -1,5 +1,6 @@
 import struct
 
+
 ## UDP header example
 # 0x02, 0x00, 0x00, 0x00, # IP
 # 0x45, # v4 + header length(1byte)
@@ -31,13 +32,13 @@ def udp_header(seq: int, dl: int) -> bytes:
 
 def is_packet(packet: bytes) -> bool:
     """Check if a packet is an IP packet"""
-    return packet[0:4] == b'\x02\x00\x00\x00'
+    return packet[0:4] == b"\x02\x00\x00\x00"
 
 
 def get_payload(packet: bytes) -> bytes:
     """Get the data from a UDP packet"""
-    b = struct.unpack('>c', packet[4:5])[0]
-    hl = (b[0] & 0x0f) * 4
+    b = struct.unpack(">c", packet[4:5])[0]
+    hl = (b[0] & 0x0F) * 4
     # add UDP or TCP header length
-    hl += 8 # hard-code UDP header length
-    return packet[hl+4:]
+    hl += 8  # hard-code UDP header length
+    return packet[hl + 4 :]
