@@ -2,10 +2,33 @@ name: Release
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+      - feature/*
 
 jobs:
   release:
     name: Release new version
+    if: github.ref == 'refs/heads/main'
     uses: dronetag/gha-shared/.github/workflows/semantic-release.yml@master
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  pre-release:
+    name: Pre-release new version
+    if: github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Create pre-release tag
+        run: |
+          LAST_VERSION=$(git describe --tags --abbrev=0)
+          STRIP_VERSION=$(echo $LAST_VERSION | sed -n -e 's/^.*v\([0-9\.]*\).*$/\1/p')
+          REF_NAME=$(echo $GITHUB_REF | sed -e 's/feature\///g')
+          TAG="$STRIP_VERSION-$REF_NAME.$GITHUB_RUN_NUMBER"
+          git config --local user.email ""
+          git config --local user.name "GitHub Action"
+          git tag -a $TAG
+          git push origin $TAG
