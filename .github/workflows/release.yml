@@ -17,7 +17,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 30
       - name: Check branch name is "feature/[a-zA-Z\-]
         run: |
           if [[ ! $GITHUB_REF =~ ^refs/heads/feature/[a-zA-Z\-]+$ ]]; then
@@ -26,6 +28,7 @@ jobs:
           fi
       - name: Create pre-release tag
         run: |
+          git describe
           LAST_VERSION=$(git describe --tags --abbrev=0)
           STRIP_VERSION=$(echo $LAST_VERSION | sed -n -e 's/^.*v\([0-9\.]*\).*$/\1/p')
           REF_NAME=$(echo $GITHUB_REF | sed -e 's/feature\///g')
