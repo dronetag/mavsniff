@@ -7,7 +7,5 @@ jobs:
   release:
     name: Release new version
     uses: dronetag/gha-shared/.github/workflows/semantic-release.yml@master
-    with:
-      must-release: true
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}
