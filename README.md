@@ -33,7 +33,7 @@ $ mavsniff wsplugin # install Wireshark MAVlink disector plugin for reading Mavl
 
 Default dialect is **arduinomega** and version is **2.0**. You can specify your custom dialect in form
 of mavlink's XML definition via `--mavlink-dialect/-m` flag. Mavsniff will copy your XML into internal
-pymavlink folder and compile it on the first run. All subsequent runs won't update nor recompile your 
+pymavlink folder and compile it on the first run. All subsequent runs won't update nor recompile your
 dialect. Once your custom dialect was imported and compiled, you can reference by its name (XML filename
 without extension).
 
