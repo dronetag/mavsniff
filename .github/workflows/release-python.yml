@@ -30,5 +30,12 @@ jobs:
           python-version: "${{ env.PYTHON_VERSION }}"
       - name: Bump version
         run: poetry version ${RELEASE_VERSION}
+      - name: Commit and push
+        run: |
+          git config --local user.email "" # Set empty email
+          git config --local user.name "GitHub Action"
+          git add pyproject.toml
+          git commit -m "chore(ci): bump pyproject.toml version to ${RELEASE_VERSION}"
+          git push
       - name: Publish
         run: poetry publish --build -n -r dronetag

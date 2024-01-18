@@ -29,13 +29,14 @@ jobs:
       - name: Run tests
         run: poetry run pytest
 
-      - name: Run coverage test and generate badge
+      - name: Run coverage test
         run: poetry run pytest --cov=mavsniff > ./pytest-coverage.txt
-      - name: Extract coverage information
+      - name: Create coverage comment (great for examining pull-requests)
         id: coverage
         uses: MishaKav/pytest-coverage-comment@main
         with:
           pytest-coverage-path: ./pytest-coverage.txt
+      # only on main branch
       - name: Create the Badge
         if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
         uses: schneegans/dynamic-badges-action@v1.6.0
