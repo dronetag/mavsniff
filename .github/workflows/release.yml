@@ -1,4 +1,4 @@
-name: Release
+name: Release main branch (manual)
 
 on:
   workflow_dispatch:
@@ -10,31 +10,3 @@ jobs:
     uses: dronetag/gha-shared/.github/workflows/semantic-release.yml@master
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}
-
-  pre-release:
-    name: Pre-release new version
-    if: startsWith(github.ref, 'refs/heads/feature/')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-      - name: Check branch name is "feature/[a-zA-Z\-]
-        run: |
-          if [[ ! $GITHUB_REF =~ ^refs/heads/feature/[a-zA-Z\-]+$ ]]; then
-            echo "Branch name must be feature/[a-zA-Z\-]"
-            exit 1
-          fi
-      - name: Create pre-release tag
-        run: |
-          git describe
-          LAST_VERSION=$(git describe --tags --abbrev=0)
-          STRIP_VERSION=$(echo $LAST_VERSION | sed -n -e 's/^.*v\([0-9\.]*\).*$/\1/p')
-          REF_NAME=$(echo $GITHUB_REF | sed -e 's/feature\///g')
-          TAG="$STRIP_VERSION-$REF_NAME.$GITHUB_RUN_NUMBER"
-          git config --local user.email ""
-          git config --local user.name "GitHub Action"
-          git tag -a $TAG
-          git push origin $TAG
