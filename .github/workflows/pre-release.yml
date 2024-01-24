@@ -22,9 +22,10 @@ jobs:
           git fetch --prune --unshallow --tags
       - name: Create pre-release tag
         run: |
+          set -x
           LAST_VERSION=$(git describe --tags --abbrev=0)
           STRIP_VERSION=`echo $LAST_VERSION | sed -n -e 's/^.*v\([0-9\.]*\).*$/\1/p'`
-          REF_NAME=`echo $GITHUB_REF | sed -e 's/refs\/heads\/\///g' | sed -e 's/feature\///g'`
+          REF_NAME=`echo $GITHUB_REF | sed -e 's/refs\/heads\///g' | sed -e 's/feature\///g'`
           TAG="$STRIP_VERSION-$REF_NAME.$GITHUB_RUN_NUMBER"
           git config --local user.email ""
           git config --local user.name "GitHub Action"
