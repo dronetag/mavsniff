@@ -3,8 +3,8 @@ name: Release on PYPI
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    # branches:
+    #   - main
     tags:
       - v*
 
@@ -15,8 +15,6 @@ jobs:
   build:
     name: Release new version to PyPI
     runs-on: ubuntu-latest
-    env:
-      RELEASE_VERSION: ${{ env.GITHUB_REF }}  # v1.0.0 -> 1.0.0 we need to remove the prefix "v"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -29,13 +27,15 @@ jobs:
           private-pypi-pass: ${{ secrets.PRIV_PIP_PASSWORD }}
           python-version: "${{ env.PYTHON_VERSION }}"
       - name: Bump version
-        run: poetry version ${RELEASE_VERSION:1}
+        run: |
+          echo "Github ref ${GITHUB_REF:1}"
+          poetry version ${GITHUB_REF:1}
       - name: Commit and push
         run: |
           git config --local user.email "" # Set empty email
           git config --local user.name "GitHub Action"
           git add pyproject.toml
-          git commit -m "chore(ci): bump pyproject.toml version to ${RELEASE_VERSION:1}"
+          git commit -m "chore(ci): bump pyproject.toml version to ${GITHUB_REF:1}"
           git push
       - name: Publish
         run: poetry publish --build -n -r dronetag
