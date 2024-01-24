@@ -26,6 +26,10 @@ jobs:
           echo "Last version: $LAST_VERSION"
           STRIP_VERSION=`echo $LAST_VERSION | sed -n -e 's/^.*\(v[0-9\.]*\).*$/\1/p'`
           echo "Strip version: $STRIP_VERSION"
+          if [[ -z "$STRIP_VERSION" ]]; then
+            echo "No previous version in format vX.Y.Z found. Consider pruning tags."
+            exit 1
+          fi
           REF_NAME=`echo $GITHUB_REF | sed -e 's/refs\/heads\///g' | sed -e 's/feature\///g'`
           echo "Ref name: $REF_NAME"
           TAG="$STRIP_VERSION-$REF_NAME.$GITHUB_RUN_NUMBER"
