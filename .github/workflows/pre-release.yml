@@ -28,5 +28,5 @@ jobs:
           TAG="$STRIP_VERSION-$REF_NAME.$GITHUB_RUN_NUMBER"
           git config --local user.email ""
           git config --local user.name "GitHub Action"
-          git tag -a $TAG
+          git tag $TAG
           git push origin $TAG
