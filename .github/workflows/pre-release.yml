@@ -1,4 +1,4 @@
-name: Pre-release a feature branch (manual)
+name: "PRE-RELEASE"
 
 on:
   workflow_dispatch:

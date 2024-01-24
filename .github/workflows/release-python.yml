@@ -1,9 +1,9 @@
-name: Release on PYPI (automatic)
+name: "[auto] release-python"
 
 on:
   push:
     tags:
-      - v*
+      - "v*"
 
 env:
   PYTHON_VERSION: "3.10"

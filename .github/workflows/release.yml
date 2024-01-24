@@ -1,4 +1,4 @@
-name: Release main branch (manual)
+name: "RELEASE"
 
 on:
   workflow_dispatch:
