@@ -24,7 +24,7 @@ jobs:
         run: |
           LAST_VERSION=$(git describe --tags --abbrev=0)
           echo "Last version: $LAST_VERSION"
-          STRIP_VERSION=`echo $LAST_VERSION | sed -n -e 's/^.*v\([0-9\.]*\).*$/\1/p'`
+          STRIP_VERSION=`echo $LAST_VERSION | sed -n -e 's/^.*\(v[0-9\.]*\).*$/\1/p'`
           echo "Strip version: $STRIP_VERSION"
           REF_NAME=`echo $GITHUB_REF | sed -e 's/refs\/heads\///g' | sed -e 's/feature\///g'`
           echo "Ref name: $REF_NAME"
