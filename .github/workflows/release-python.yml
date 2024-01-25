@@ -29,18 +29,13 @@ jobs:
           private-pypi-user: ${{ secrets.PRIV_PIP_USER }}
           private-pypi-pass: ${{ secrets.PRIV_PIP_PASSWORD }}
           python-version: "${{ env.PYTHON_VERSION }}"
-      - name: Unshallow
-        run: |
-          git fetch --prune --unshallow
-      - name: Bump version in pyproject.toml
+      - name: Poetry update version
+        run: poetry version "${GITHUB_REF_NAME#v}"
+      - name: Commit version on release branch
         if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
         run: |
-          echo "Github ref ${GITHUB_REF_NAME:1}"
-          poetry version ${GITHUB_REF_NAME:1}
-          git config --local user.email "" # Set empty email
-          git config --local user.name "GitHub Action"
           git add pyproject.toml
-          git commit -m "chore: release version ${GITHUB_REF_NAME:1} [skip ci]"
+          git commit -m "Release ${GITHUB_REF_NAME#v} [skip ci]"
           git push
-      - name: Publish
+      - name: Poetry publish
         run: poetry publish --build -n -r dronetag

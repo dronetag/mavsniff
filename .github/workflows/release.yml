@@ -4,9 +4,22 @@ on:
   workflow_dispatch:
 
 jobs:
+
+  get-release-version:
+    name: Get new release version
+    uses: dronetag/gha-shared/.github/workflows/get-semantic-release-version.yml@feat/get-semrel-version
+
   release:
-    name: Release new version
-    if: github.ref == 'refs/heads/main'
-    uses: dronetag/gha-shared/.github/workflows/semantic-release.yml@master
-    secrets:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
+    name: Pre-release new version
+    needs: get-release-version
+    env:
+      VERSION: ${{ needs.get-release-version.outputs.version }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Create the tag
+        run: |
+          git config --local user.email "" && git config --local user.name "GitHub Action"
+          git tag -a "v$VERSION" -m "Version $VERSION"
+          git push origin "v$VERSION"
