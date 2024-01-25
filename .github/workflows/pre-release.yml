@@ -6,20 +6,22 @@ on:
 jobs:
   pre-release:
     name: Pre-release new version
-    if: startsWith(github.ref, 'refs/heads/feature/')
+    if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
+      - name: Get python version
+        id: python-version
+        run: python --version
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Required to determine version
       - name: Check branch name is "feature/[a-zA-Z\-]
         run: |
           if [[ ! $GITHUB_REF_NAME =~ ^feature/[a-zA-Z\-]+$ ]]; then
             echo "Branch name must be feature/[a-zA-Z\-]"
             exit 1
           fi
-      - name: Unshallow
-        run: |
-          git fetch --prune --unshallow --tags
       - name: Create pre-release tag
         run: |
           LAST_VERSION=$(git describe --tags --abbrev=0)
@@ -34,7 +36,7 @@ jobs:
           echo "Ref name: $REF_NAME"
           TAG="$STRIP_VERSION-$REF_NAME.$GITHUB_RUN_NUMBER"
           echo "Tag: $TAG"
-          git config --local user.email ""
-          git config --local user.name "GitHub Action"
-          git tag $TAG
-          git push origin $TAG
+          #git config --local user.email ""
+          #git config --local user.name "GitHub Action"
+          #git tag -a $TAG -m "pre-release $TAG"
+          #git push origin $TAG
