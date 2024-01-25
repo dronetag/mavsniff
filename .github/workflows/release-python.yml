@@ -29,13 +29,18 @@ jobs:
           private-pypi-user: ${{ secrets.PRIV_PIP_USER }}
           private-pypi-pass: ${{ secrets.PRIV_PIP_PASSWORD }}
           python-version: "${{ env.PYTHON_VERSION }}"
+
       - name: Poetry update version
-        run: poetry version "${GITHUB_REF_NAME#v}"
-      - name: Commit version on release branch
-        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
         run: |
-          git add pyproject.toml
-          git commit -m "Release ${GITHUB_REF_NAME#v} [skip ci]"
-          git push
-      - name: Poetry publish
-        run: poetry publish --build -n -r dronetag
+          poetry version "${GITHUB_REF_NAME#v}"
+          poetry publish --build -n -r dronetag
+
+      - name: Commit version on release branch
+        run: |
+          if [[ $(git rev-parse heads/main) = $(git rev-parse ${GITHUB_REF}) ]]; then
+            echo "We are at the top of main branch so we can commit the version bump"
+            git checkout main
+            git add pyproject.toml
+            git commit -m "Release ${GITHUB_REF_NAME#v} [skip ci]"
+            git push
+          fi

@@ -18,8 +18,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Download changelog
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog
       - name: Create the tag
         run: |
+          ls -al  # just for testing the changelog artifact
           git config --local user.email "" && git config --local user.name "GitHub Action"
           git tag -a "v$VERSION" -m "Version $VERSION"
           git push origin "v$VERSION"
