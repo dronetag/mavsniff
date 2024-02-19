@@ -34,13 +34,15 @@ jobs:
         run: poetry run pytest
 
       - name: Run coverage test
-        run: poetry run pytest --cov=mavsniff > ${RUNNER_TEMP}/pytest-coverage.txt
+        run: poetry run pytest --cov=mavsniff | tee .pytest-coverage.txt
 
       - name: Create coverage comment (great for examining pull-requests)
         id: coverage
         uses: MishaKav/pytest-coverage-comment@main
         with:
-          pytest-coverage-path: ${RUNNER_TEMP}/pytest-coverage.txt
+          pytest-coverage-path: .pytest-coverage.txt
+          create-new-comment: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create the Badge
         if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
