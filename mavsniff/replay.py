@@ -38,11 +38,16 @@ class Replay:
         empty = 0
         non_data = 0
         sleep_time = 0.0
-        proceed = lambda: not self.done and (limit < 0 or written < limit)
+
+        def proceed():
+            return not self.done and (limit < 0 or written < limit)
 
         def report_stats():
             while proceed():
-                logger.info(f"replayed {written}, empty: {empty}, unknown: {non_data}, slept: {sleep_time:.2}s")
+                logger.info(
+                    f"replayed {written}, empty: {empty}, "
+                    f"unknown: {non_data}, slept: {sleep_time:.2}s"
+                )
                 time.sleep(1.0)
 
         threading.Thread(target=report_stats).start()
@@ -59,10 +64,15 @@ class Replay:
             if not packet.packet_data:
                 empty += 1
                 continue
-            if packet.packet_data[0] in (0xFE, 0xFD):  # mavlink magic bytes (0xfe "v1.0", 0xfd "v2.0")
+            if packet.packet_data[0] in (
+                0xFE,
+                0xFD,
+            ):  # mavlink magic bytes (0xfe "v1.0", 0xfd "v2.0")
                 sleep_time += self._send_in_timely_manner(packet.timestamp, packet.packet_data)
             elif ip.is_packet(packet.packet_data):
-                sleep_time += self._send_in_timely_manner(packet.timestamp, ip.get_payload(packet.packet_data))
+                sleep_time += self._send_in_timely_manner(
+                    packet.timestamp, ip.get_payload(packet.packet_data)
+                )
             else:
                 non_data += 1
                 logger.debug(f"unknown packet: {packet.packet_data[:10]}...")

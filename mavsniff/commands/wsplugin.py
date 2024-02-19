@@ -1,9 +1,13 @@
 """
 Build and install Mavlink plugin for Wireshark
 
-python3 -m pymavlink.tools.mavgen --lang=WLua --wire-protocol=2.0 --output=mavlink_2_common message_definitions/v1.0/common.xml
+Effectivelly, this command is a wrapper around pymavlink's mavgen tool, which generates a Wireshark
+plugin from Mavlink XML definitions as following:
 
-Wireshark filter expression:
+python3 -m pymavlink.tools.mavgen --lang=WLua --wire-protocol=2.0 \
+    --output=mavlink_2_common message_definitions/v1.0/common.xml
+
+Filter expression to use in Wireshark to see only Mavlink traffic is as following:
 mavlink_proto && not icmp
 """
 
@@ -87,7 +91,11 @@ def wsplugin(dialects, version, wireshark_plugin_dir, override, delete) -> int:
 
     opts = mavgen.Opts(plugin_name, wire_protocol=version, language="wlua")
     mavgen.mavgen(
-        opts, (Path(mavgen.__file__).parent / f"../message_definitions/v1.0/{dialect}.xml" for dialect in dialects)
+        opts,
+        (
+            Path(mavgen.__file__).parent / f"../message_definitions/v1.0/{dialect}.xml"
+            for dialect in dialects
+        ),
     )
 
     if not plugin_file.exists():

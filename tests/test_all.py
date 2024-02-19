@@ -32,7 +32,7 @@ def test_capture_timing():
     buffer = io.BytesIO()
     mavconn = mavlink(TEST_DEVICE_URL, input=True)
 
-    # step 1: generate packets with pauses between them and save those into a in-memory pcapng file."""
+    # step 1: generate packets with pauses between them and save those into a in-memory pcapng file.
     ## start reading thread that blocks while waiting for IO
     try:
         c = Capture(device=mavconn, file=buffer)
@@ -136,7 +136,7 @@ def test_capture_garbage():
     device = mavlink(TEST_DEVICE_URL, input=True, dialect="ardupilotmega")
     buffer = io.BytesIO()
 
-    # step 1: generate packets with pauses between them and save those into a in-memory pcapng file."""
+    # step 1: generate packets with pauses between them and save those into a in-memory pcapng file.
     ## start reading thread that blocks while waiting for IO
     c = Capture(device, buffer)
     t = threading.Thread(target=c.run)
@@ -181,14 +181,20 @@ def test_capture_garbage():
 def _generate_packets_and_garbage(mavlink: mavutil.mavfile):
     mavlink.write(b"garbage")
     mavlink.write(
-        mavlink2.MAVLink_mission_count_message(target_system=42, target_component=0, count=13).pack(mavlink.mav)
+        mavlink2.MAVLink_mission_count_message(target_system=42, target_component=0, count=13).pack(
+            mavlink.mav
+        )
     )
     time.sleep(0.1)
     mavlink.write(
-        mavlink2.MAVLink_mission_count_message(target_system=42, target_component=0, count=42).pack(mavlink.mav)
+        mavlink2.MAVLink_mission_count_message(target_system=42, target_component=0, count=42).pack(
+            mavlink.mav
+        )
     )
     invalid_message = bytearray(
-        mavlink2.MAVLink_mission_count_message(target_system=42, target_component=0, count=43).pack(mavlink.mav)
+        mavlink2.MAVLink_mission_count_message(target_system=42, target_component=0, count=43).pack(
+            mavlink.mav
+        )
     )
     for i in range(0, 11):
         invalid_message[i] = 0x00  # zero the mavlink header to render it invalid
@@ -196,11 +202,15 @@ def _generate_packets_and_garbage(mavlink: mavutil.mavfile):
     mavlink.write(b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")
     time.sleep(0.1)
     mavlink.write(
-        mavlink2.MAVLink_mission_count_message(target_system=42, target_component=0, count=50).pack(mavlink.mav)
+        mavlink2.MAVLink_mission_count_message(target_system=42, target_component=0, count=50).pack(
+            mavlink.mav
+        )
     )
     time.sleep(0.1)
     mavlink.write(
-        mavlink2.MAVLink_mission_count_message(target_system=42, target_component=0, count=51).pack(mavlink.mav)
+        mavlink2.MAVLink_mission_count_message(target_system=42, target_component=0, count=51).pack(
+            mavlink.mav
+        )
     )
     time.sleep(0.1)
     mavlink.close()

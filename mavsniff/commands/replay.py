@@ -6,7 +6,10 @@ from mavsniff.replay import Replay
 from mavsniff.utils.log import logger
 from mavsniff.utils.mav import mavlink
 
-as_pcapng = lambda f: f if "." in f else f + ".pcapng"
+
+def as_pcapng(filename: str):
+    """Append .pcapng suffix if there is no suffix in the filename"""
+    return filename if "." in filename else filename + ".pcapng"
 
 
 @click.command()
@@ -18,7 +21,11 @@ as_pcapng = lambda f: f if "." in f else f + ".pcapng"
     help="device URI (/dev/tty..., COMx on windows or udp://host:port, tcp://host:port)",
 )
 @click.option(
-    "--limit", "-l", default=-1, type=int, help="limit the number of read/written packets (default -1 unlimited)"
+    "--limit",
+    "-l",
+    default=-1,
+    type=int,
+    help="limit the number of read/written packets (default -1 unlimited)",
 )
 @click.option("--verbose", "-v", is_flag=True, default=False, help="enable debug logging")
 def replay(file, device, verbose, limit) -> int:

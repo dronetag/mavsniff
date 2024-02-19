@@ -39,7 +39,9 @@ class Capture:
                 interface_id=0x00,
                 section=self.sbh,
                 options={
-                    "if_name": device.address if ":" not in device.address else device.address.split(":")[1],
+                    "if_name": device.address
+                    if ":" not in device.address
+                    else device.address.split(":")[1],
                     "if_txspeed": getattr(self.device, "baudrate", 0),
                     "if_rxspeed": getattr(self.device, "baudrate", 0),
                     "if_tsresol": struct.pack("<B", 6),  # negative power of 10
@@ -62,7 +64,8 @@ class Capture:
         def report_stats():
             while not self.done:
                 logger.info(
-                    f"captured {received}, not-parsed: {other_messages}, empty: {empty_messages}, bad: {bad_messages}"
+                    f"captured {received}, not-parsed: {other_messages}, "
+                    f"empty: {empty_messages}, bad: {bad_messages}"
                 )
                 time.sleep(1.0)
 

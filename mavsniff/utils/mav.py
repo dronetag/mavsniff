@@ -13,11 +13,13 @@ ParseError = mavparse.MAVParseError
 mavutil.add_message = lambda messages, mtype, msg: None
 
 
-def mavlink(uri: str, input: bool, dialect: str = "ardupilotmega", version: int = 2, **kwargs) -> mavutil.mavfile:
+def mavlink(
+    uri: str, input: bool, dialect: str = "ardupilotmega", version: int = 2, **kwargs
+) -> mavutil.mavfile:
     """
     Create mavlink IO device
-    @param uri: device path (e.g. udp://localhost:14445, tcp://localhost:14550, /dev/ttyUSB0, /dev/ttyS0, COM1...)
-    @param dialect: MAVLink dialect (all, ardupilotmega, common, pixhawk...) @see pymavlink.dialects for more
+    @param uri: device path (e.g. udp://localhost:14445, /dev/ttyUSB0, /dev/ttyS0, COM1...)
+    @param dialect: MAVLink dialect (all, ardupilotmega, common, pixhawk...) @see pymavlink.dialects
     """
     if input:  # the names for input and output are not consistent in pymavlink
         if uri.startswith("tcp:"):
@@ -83,7 +85,8 @@ def install_dialect(dialect: str, version: int) -> Path:
     dialect_root_dir = mavlink_root / "dialects" / ("v20" if version == 2 else "v10")
     if dialect_path.parent == dialect_root_dir:
         raise RuntimeError(
-            "Do not specify dialect as a full path to pymavlink's " "internal directory. Use alias (name) instead."
+            "Do not specify dialect as a full path to pymavlink's "
+            "internal directory. Use alias (name) instead."
         )
 
     # install XML definition and build a python module from it
