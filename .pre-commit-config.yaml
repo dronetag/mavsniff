@@ -4,38 +4,52 @@
 repos:
   - repo: local
     hooks:
-    - id: pyflakes
-      name: pyflakes
-      entry: poetry run pyflakes
+    - id: ruff
+      name: Ruff
+      entry: poetry run ruff --fix
       language: system
       types: [python]
+      stages: ["pre-commit"]
+    - id: ruff-format
+      name: Ruff format
+      entry: poetry run ruff format
+      language: system
+      types: [python]
+      stages: ["pre-commit"]
     - id: mypy
       name: mypy
       entry: poetry run mypy --exclude tests --ignore-missing-imports --follow-imports=skip --pretty
       language: system
       types: [python]
-    - id: black
-      name: black
-      entry: poetry run black --check --diff
-      language: system
-      types: [python]
-    - id: isort
-      name: isort
-      entry: poetry run isort --profile black --check-only
-      language: system
-      types: [python]
+      stages: ["pre-commit"]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
     - id: trailing-whitespace
+      stages: ["pre-commit"]
     - id: check-docstring-first
+      stages: ["pre-commit"]
     - id: check-added-large-files
+      stages: ["pre-commit"]
     - id: check-yaml
+      stages: ["pre-commit"]
     - id: debug-statements
+      stages: ["pre-commit"]
     - id: check-merge-conflict
+      stages: ["pre-commit"]
     - id: end-of-file-fixer
-  - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
-    rev: v9.11.0
+      stages: ["pre-commit"]
+
+  # https://www.conventionalcommits.org/en/v1.0.0/
+  # type(scope)?: description (body)? (footer)? (lowercase, present tense, and no period at the end)
+  - repo: local
     hooks:
-    - id: commitlint
-      stages: [commit-msg]
+    - id: commit-msg
+      name: conventional commit message
+      language: pygrep
+      entry: '^(chore|test|feat|fix|build|docs|refactor)!?(\([a-z]+\))?: (?![A-Z][a-z])(?![a-z]+(ed|ing)\s).*$'
+      args:
+      - --multiline
+      - --negate # fails if the entry is NOT matched
+      stages:
+      - commit-msg

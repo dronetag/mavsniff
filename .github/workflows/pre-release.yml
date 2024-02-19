@@ -1,40 +1,22 @@
-name: "PRE-RELEASE"
+name: 'What is the next version?'
 
 on:
   workflow_dispatch:
 
 jobs:
-  pre-release:
-    name: Pre-release new version
-    if: startsWith(github.ref, 'refs/heads/feature/')
+  release:
+    name: Get Next Release
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Check branch name is "feature/[a-zA-Z\-]
-        run: |
-          if [[ ! $GITHUB_REF_NAME =~ ^feature/[a-zA-Z\-]+$ ]]; then
-            echo "Branch name must be feature/[a-zA-Z\-]"
-            exit 1
-          fi
-      - name: Unshallow
-        run: |
-          git fetch --prune --unshallow --tags
-      - name: Create pre-release tag
-        run: |
-          LAST_VERSION=$(git describe --tags --abbrev=0)
-          echo "Last version: $LAST_VERSION"
-          STRIP_VERSION=`echo $LAST_VERSION | sed -n -e 's/^.*\(v[0-9\.]*\).*$/\1/p'`
-          echo "Strip version: $STRIP_VERSION"
-          if [[ -z "$STRIP_VERSION" ]]; then
-            echo "No previous version in format vX.Y.Z found. Consider pruning tags."
-            exit 1
-          fi
-          REF_NAME=`echo $GITHUB_REF_NAME | sed -e 's/feature\///g'`
-          echo "Ref name: $REF_NAME"
-          TAG="$STRIP_VERSION-$REF_NAME.$GITHUB_RUN_NUMBER"
-          echo "Tag: $TAG"
-          git config --local user.email ""
-          git config --local user.name "GitHub Action"
-          git tag $TAG
-          git push origin $TAG
+    - name: Checkout repository (full-depth)
+      uses: actions/checkout@v4
+      with: { fetch-depth: 0 } # Required to determine version
+
+    - name: Get next release version
+      uses: dronetag/actions/semantic-release@main
+      id: semantic
+      with:
+        changelog: true
+
+    - name: Changelog
+      run: echo "${{ steps.semantic.outputs.changelog }}"
