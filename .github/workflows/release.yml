@@ -10,7 +10,6 @@ jobs:
   release:
     name: Tag and Release
     runs-on: ubuntu-latest
-    needs: test
     steps:
     - name: Checkout repository (full-depth)
       uses: actions/checkout@v4
@@ -31,36 +30,18 @@ jobs:
 
     - name: Build the project
       run: |
-        poetry version "${GITHUB_REF_NAME#v}"
+        poetry version "${{ steps.semantic.outputs.version }}"
         poetry build
 
     - name: Commit and tag
       if: ${{ steps.semantic.outputs.existed == 'false' }}
-      uses: dronetag/actions/commit-and-tag@main
+      uses: dronetag/actions/release@main
       with:
         github-token: ${{ github.token }}
-        commit: true
-        git-add: changelog.md
+        changelog: ${{ steps.semantic.outputs.changelog }}
+        commit-changelog: true
         version: ${{ steps.semantic.outputs.version }}
 
     - name: Publish package with poetry
       run: |
         poetry publish -n -r dronetag --skip-existing
-
-  test:
-    name: Tag and Release
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository (full-depth)
-      uses: actions/checkout@v4
-
-    - name: Install DEV dependencies
-      run: |
-        python3 -m pip install --upgrade pip wheel poetry
-        poetry install -E dev
-
-    - name: Run pro-commit checks
-      run: poetry run pre-commit run --all-files
-
-    - name: Run tests
-      run: poetry run pytest

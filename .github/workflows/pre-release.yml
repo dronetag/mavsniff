@@ -15,8 +15,6 @@ jobs:
     - name: Get next release version
       uses: dronetag/actions/semantic-release@main
       id: semantic
-      with:
-        changelog: true
 
     - name: Changelog
       run: echo "${{ steps.semantic.outputs.changelog }}"
