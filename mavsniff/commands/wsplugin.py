@@ -15,6 +15,7 @@ import os.path
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Iterable, Optional
 
 import click
 import pymavlink
@@ -41,7 +42,8 @@ VERSIONS = (mavparse.PROTOCOL_0_9, mavparse.PROTOCOL_1_0, mavparse.PROTOCOL_2_0)
     help="Mavlink version; choices: " + str(VERSIONS),
 )
 @click.argument("dialects", nargs=-1)
-def wsplugin(dialects, version, wireshark_plugin_dir, override, delete) -> int:
+def wsplugin(dialects: Iterable[str], version: str, wireshark_plugin_dir: Optional[str],
+             override: bool, delete: bool) -> int:
     """Build and install Mavlink plugin for Wireshark"""
     if version not in VERSIONS:
         click.echo(f"[ERROR] Invalid mavlink version: {version}")
@@ -62,7 +64,7 @@ def wsplugin(dialects, version, wireshark_plugin_dir, override, delete) -> int:
             wireshark_plugin_dir = os.path.expandvars(LIN_PATH)
     click.echo(f"[INFO] Using wireshark plugin directory: {wireshark_plugin_dir}")
 
-    wireshark_plugin_path = Path(wireshark_plugin_dir)
+    wireshark_plugin_path = Path(wireshark_plugin_dir).expanduser()
     if not wireshark_plugin_path.exists():
         wireshark_plugin_path.mkdir(parents=True, exist_ok=True)
 
@@ -89,7 +91,7 @@ def wsplugin(dialects, version, wireshark_plugin_dir, override, delete) -> int:
         click.echo("[ERROR] Use --override to overwrite it")
         return 1
 
-    opts = mavgen.Opts(plugin_name, wire_protocol=version, language="wlua")
+    opts = mavgen.Opts(str(plugin_file), wire_protocol=version, language="wlua")
     mavgen.mavgen(
         opts,
         (
@@ -102,12 +104,10 @@ def wsplugin(dialects, version, wireshark_plugin_dir, override, delete) -> int:
         click.echo(f"[ERROR] Failed to generate {plugin_file}")
         return 1
 
-    Path(plugin_name).replace(plugin_file)
     version_file.write_text(
         f"""Pymavlink version: {pymavlink.__version__}
 Built at: {datetime.now()}
 Dialects: {dialects}
 """
     )
-    click.echo(f"Created {plugin_file}")
     return 0

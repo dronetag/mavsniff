@@ -27,7 +27,7 @@ $ mavsniff wsplugin # install Wireshark MAVlink disector plugin for reading Mavl
  * `-d /dev/ttyS0` - standard serial port on UNIX systems
  * `-d COMx` - from COM1 to COM8 - standard serial ports on Windows systems
  * `-d udp://<host>:<port>` or `tcp://<host>:<port>` - receive or send packets over network (TCP or UDP)
- * currently, there is no option how to **send** MAVLink packets over the network.
+ * `-d file.tlog` - almost any (at least a bit standard) binary or textual file can be replayed
 
 ### Dialects
 
