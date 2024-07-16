@@ -1,19 +1,46 @@
 # mavsniff
 
-![Licence Badge](https://badgen.net/badge/License/MIT/blue)
+![License Badge](https://badgen.net/badge/License/MIT/blue)
 ![Coverage Badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/katomaso/bda1e64c276a6d6e6a4e65fb5dc9330b/raw/coverage.json)
 
 Capture and replay MAVLink packets from your drone or GCS. Works on Linux and Windows.
 
-You can read from a serial line (_/dev/ttyXXX or COMx_) or even from network (TCP and UDP). Mavsniff stores packets in pcapng format so you can analyse them with Wireshark.
+You can read from a serial line (_/dev/ttyXXX or COMx_) or even from network (TCP and UDP). Mavsniff stores packets in pcapng format so you can analyze them with Wireshark.
 
-## Instalation
+## Installation
 
-```$ pip install mavsniff```
+```pip install git+https://github.com/dronetag/mavsniff.git@v1.1.2```
 
-Mavsniff is distributed via PYPI and an entrypoint `mavsniff` should be available in your `$PATH` after installation.
+If you are running mavsniff on WSL then you need a tool for forwarding the USB to Linux.
+For that, WSL uses _usbip_ on Linux side `sudo apt install usbip`
+and [WSL USB Manager](https://gitlab.com/alelec/wsl-usb-gui/-/releases) on Windows side.
+
+For installation on Windows, you will need Python3 (install from Windows Store) and Git
+(install from https://git-scm.com/).
+
 
 ## Usage
+
+Once your device is plugged then we need to find out on which port did it connect. It
+will be /dev/ttyACMx (or /dev/ttyUSBx) on Linux and COMxy on Windows. Use `mavsniff ports`
+for this.
+
+```
+$ mavsniff ports
+Usual baudrate is 115200, sometimes 57600
+Your available COM ports are:
+ - /dev/ttyACM0: Dronetag Beacon 2 [USB VID:PID=1900:5212 SER=397E9D237C782B7B LO...]
+```
+
+on Windows, the output might be more cryptic but still only one COM port shows up and
+that would be your device (COMxy)
+
+```
+Your available COM ports are:
+ - COM67: USB Serial Device (COM67) [USB VID:PID=1900:5212 SER=397E9D237C782B7B LO...]
+```
+
+Now you are ready to to capture or replay traffic.
 
 ```bash
 $ mavsniff capture --device udp://localhost:5467 --file recording --mavlink-dialect path-to-custom/my-dialect.xml

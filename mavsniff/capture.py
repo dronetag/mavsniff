@@ -50,8 +50,11 @@ class Capture:
             )
         )
         signal.signal(signal.SIGINT, self.stop)
+        signal.signal(signal.SIGKILL, self.stop)
+        signal.signal(signal.SIGHUP, self.stop)
 
-    def run(self, limit=-1, limit_invalid_packets=-1) -> int:
+
+    def run(self, limit: int=-1, limit_invalid_packets: int=-1) -> int:
         """Store Mavlink messages into a PCAPNG file"""
         self.writer = pcapng.FileWriter(self.file, self.sbh)
         self.done = False
@@ -96,6 +99,7 @@ class Capture:
                 break
         return received
 
+
     def _write_packet(self, seq: int, data: bytes):
         """Write packet to the device"""
         now_us = time.time_ns() // 1000
@@ -119,5 +123,7 @@ class Capture:
             )
         )
 
-    def stop(self, *args):
+
+    def stop(self, *args, **kwargs):
+        logger.info(f"Termination event caught {args} - quitting")
         self.done = True
