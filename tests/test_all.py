@@ -1,6 +1,7 @@
 import io
 import threading
 import time
+from typing import IO
 
 import pcapng
 from pymavlink import mavutil
@@ -34,9 +35,9 @@ def test_capture_timing():
 
     # step 1: generate packets with pauses between them and save those into a in-memory pcapng file.
     ## start reading thread that blocks while waiting for IO
+    c = Capture(device=mavconn, file=buffer)
+    t = threading.Thread(target=c.run)
     try:
-        c = Capture(device=mavconn, file=buffer)
-        t = threading.Thread(target=c.run)
         t.start()
         time.sleep(0.01)
 
@@ -81,8 +82,8 @@ def test_capture_replay():
     file = open("test_capture_replay.pcapng", "wb")
     mavinput = mavlink(TEST_DEVICE_URL, input=True)
     c = Capture(mavinput, file)
+    t = threading.Thread(target=c.run)
     try:
-        t = threading.Thread(target=c.run)
         t.start()
         time.sleep(0.01)
         _generate_packets()
@@ -90,7 +91,8 @@ def test_capture_replay():
         c.stop()
         t.join()
         file.close()
-        mavinput.close()
+        if hasattr(mavinput, "close"):
+            mavinput.close()
 
     # step 3: read the in-memory file and check that the timing of packets is saved correctly
     mavinput = mavlink(TEST_DEVICE_URL, input=True)
@@ -134,7 +136,7 @@ def test_capture_replay():
 def test_capture_garbage():
     """Simple test that packets get captured with correct timing"""
     device = mavlink(TEST_DEVICE_URL, input=True, dialect="ardupilotmega")
-    buffer = io.BytesIO()
+    buffer: IO[bytes] = io.BytesIO()
 
     # step 1: generate packets with pauses between them and save those into a in-memory pcapng file.
     ## start reading thread that blocks while waiting for IO

@@ -1,10 +1,7 @@
-import io
-import os
-import signal
 import struct
 import threading
 import time
-from typing import Any, Optional
+from typing import IO, Any, Optional
 
 import pcapng
 import serial
@@ -18,13 +15,13 @@ from mavsniff.utils.log import logger
 class Capture:
     """Capture reads Mavlink messages from a device and store them into a PCAPNG file"""
 
-    file: io.BufferedWriter
+    file: IO[bytes]
     device: mavutil.mavfile
     writer: Optional[pcapng.FileWriter]
     done: bool
     sbh: pcapng.blocks.SectionHeader
 
-    def __init__(self, device: mavutil.mavfile, file: io.BufferedWriter):
+    def __init__(self, device: mavutil.mavfile, file: IO[bytes]):
         self.device = device
         self.file = file
         self.done = False
@@ -61,8 +58,8 @@ class Capture:
             )
         )
 
-    def stop(self, sig: int, frame: Optional[Any]) -> None:
-        logger.info("Termination event caught - quitting")
+    def stop(self, sig: int = 0, frame: Optional[Any] = None) -> None:
+        logger.debug("Termination event caught - quitting")
         self.done = True
 
     def report_stats(self):
@@ -78,11 +75,6 @@ class Capture:
         """Store Mavlink messages into a PCAPNG file"""
         if self.writer is not None:
             raise RuntimeError("Called run method twice")
-
-        signal.signal(signal.SIGINT, self.stop)
-        if os.name == "posix":
-            signal.signal(signal.SIGKILL, self.stop)
-            signal.signal(signal.SIGHUP, self.stop)
 
         self.writer = pcapng.FileWriter(self.file, self.sbh)
         self.done = False

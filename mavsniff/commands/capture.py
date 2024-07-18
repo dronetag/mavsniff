@@ -1,4 +1,5 @@
 import logging
+import signal
 
 import click
 
@@ -74,8 +75,11 @@ def capture(
             logger.error(str(e))
         return 1
 
+    capture = Capture(device=mavconn, file=pcapfile)
+    signal.signal(signal.SIGINT, capture.stop)
+
     try:
-        captured = Capture(device=mavconn, file=pcapfile).run(limit=limit)
+        captured = capture.run(limit=limit)
         logger.info(f"captured {captured} valid MAVLink packets")
         return 0
     finally:

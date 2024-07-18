@@ -1,7 +1,7 @@
 import io
-import signal
 import threading
 import time
+from typing import Any, Optional
 
 import pcapng  # type: ignore[import-untyped]
 from pymavlink import mavutil  # type: ignore[import-untyped]
@@ -23,7 +23,6 @@ class Replay:
         self.file = file
         self.device = device
         self.done = False
-        signal.signal(signal.SIGINT, self.stop)
 
     def run(self, limit=-1) -> int:
         """Replay a PCAPNG file to a device"""
@@ -95,5 +94,6 @@ class Replay:
         self.last_packet_ts = timestamp
         return sleep_time if sleep_time > 0.00001 else 0.0
 
-    def stop(self, *args):
+    def stop(self, sig: int = 0, frame: Optional[Any] = None):
+        logger.debug("Termination event caught - quitting")
         self.done = True

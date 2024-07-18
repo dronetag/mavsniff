@@ -1,4 +1,5 @@
 import logging
+import signal
 
 import click
 
@@ -28,7 +29,7 @@ def as_pcapng(filename: str):
     help="limit the number of read/written packets (default -1 unlimited)",
 )
 @click.option("--verbose", "-v", is_flag=True, default=False, help="enable debug logging")
-def replay(file, device, verbose, limit) -> int:
+def replay(file: str, device: str, verbose: bool, limit: int) -> int:
     """Replay mavlink communication from a pcapng file to a (serial emulating) device"""
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
@@ -53,8 +54,11 @@ def replay(file, device, verbose, limit) -> int:
             logger.error(str(e))
         return 1
 
+    replay = Replay(file=pcapfile, device=mavconn)
+    signal.signal(signal.SIGINT, replay.stop)
+
     try:
-        replayed = Replay(file=pcapfile, device=mavconn).run(limit=limit)
+        replayed = replay.run(limit=limit)
         logger.info(f"replayed {replayed} valid MAVLink packets")
         return 0
     finally:
