@@ -42,8 +42,13 @@ VERSIONS = (mavparse.PROTOCOL_0_9, mavparse.PROTOCOL_1_0, mavparse.PROTOCOL_2_0)
     help="Mavlink version; choices: " + str(VERSIONS),
 )
 @click.argument("dialects", nargs=-1)
-def wsplugin(dialects: Iterable[str], version: str, wireshark_plugin_dir: Optional[str],
-             override: bool, delete: bool) -> int:
+def wsplugin(
+    dialects: Iterable[str],
+    version: str,
+    wireshark_plugin_dir: Optional[str],
+    override: bool,
+    delete: bool,
+) -> int:
     """Build and install Mavlink plugin for Wireshark"""
     if version not in VERSIONS:
         click.echo(f"[ERROR] Invalid mavlink version: {version}")

@@ -1,9 +1,9 @@
 import io
+import os
 import signal
 import struct
 import threading
 import time
-import os
 from typing import Any, Optional
 
 import pcapng
@@ -22,6 +22,7 @@ class Capture:
     device: mavutil.mavfile
     writer: Optional[pcapng.FileWriter]
     done: bool
+    sbh: pcapng.blocks.SectionHeader
 
     def __init__(self, device: mavutil.mavfile, file: io.BufferedWriter):
         self.device = device
@@ -60,11 +61,9 @@ class Capture:
             )
         )
 
-
     def stop(self, sig: int, frame: Optional[Any]) -> None:
-        logger.info(f"Termination event caught - quitting")
+        logger.info("Termination event caught - quitting")
         self.done = True
-
 
     def report_stats(self):
         while not self.done:
@@ -75,8 +74,7 @@ class Capture:
             self.empty_messages = 0  # zero-out the empty messages counter or it overflows quickly
             time.sleep(1.0)
 
-
-    def run(self, limit: int=-1, limit_invalid_packets: int=-1) -> int:
+    def run(self, limit: int = -1, limit_invalid_packets: int = -1) -> int:
         """Store Mavlink messages into a PCAPNG file"""
         if self.writer is not None:
             raise RuntimeError("Called run method twice")
@@ -117,9 +115,9 @@ class Capture:
         self.device.close()
         return self.received
 
-
     def _write_packet(self, seq: int, data: bytes):
         """Write packet to the device"""
+        assert self.writer is not None
         now_us = time.time_ns() // 1000
         payload = udp_header(seq, len(data)) + data
         self.writer.write_block(

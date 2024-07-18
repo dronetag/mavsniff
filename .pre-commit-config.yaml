@@ -1,12 +1,20 @@
 # File introduces automated checks triggered on git events
 # to enable run `pip install pre-commit && pre-commit install`
 
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+  # - prepare-commit-msg  # allow together with gira
+
+default_stages:
+  - pre-commit
+
 repos:
   - repo: local
     hooks:
     - id: ruff
       name: Ruff
-      entry: poetry run ruff --fix
+      entry: poetry run ruff check --fix
       language: system
       types: [python]
       stages: ["pre-commit"]
@@ -22,34 +30,20 @@ repos:
       language: system
       types: [python]
       stages: ["pre-commit"]
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
     - id: trailing-whitespace
-      stages: ["pre-commit"]
     - id: check-docstring-first
-      stages: ["pre-commit"]
     - id: check-added-large-files
-      stages: ["pre-commit"]
     - id: check-yaml
-      stages: ["pre-commit"]
     - id: debug-statements
-      stages: ["pre-commit"]
     - id: check-merge-conflict
-      stages: ["pre-commit"]
     - id: end-of-file-fixer
-      stages: ["pre-commit"]
 
-  # https://www.conventionalcommits.org/en/v1.0.0/
-  # type(scope)?: description (body)? (footer)? (lowercase, present tense, and no period at the end)
-  - repo: local
+  - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
+    rev: v9.13.0
     hooks:
-    - id: commit-msg
-      name: conventional commit message
-      language: pygrep
-      entry: '^(chore|test|feat|fix|build|docs|refactor)!?(\([a-z]+\))?: (?![A-Z][a-z])(?![a-z]+(ed|ing)\s).*$'
-      args:
-      - --multiline
-      - --negate # fails if the entry is NOT matched
-      stages:
-      - commit-msg
+    - id: commitlint
+      stages: [commit-msg]
