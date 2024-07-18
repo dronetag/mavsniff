@@ -56,7 +56,7 @@ def wsplugin(
 
     plugin_name = "mavlink_disector.lua"
     if wireshark_plugin_dir is None:
-        wireshark_plugin_path = Path(click.get_app_dir("wireshark"), "plugins")
+        wireshark_plugin_path = Path(click.get_app_dir("wireshark"), "plugins").expanduser()
         if wireshark_plugin_path.exists():
             wireshark_plugin_dir = str(wireshark_plugin_path)
 
@@ -106,7 +106,7 @@ def wsplugin(
     )
 
     if not plugin_file.exists():
-        click.echo(f"[ERROR] Failed to generate {plugin_file}")
+        click.echo(f"[ERROR] Did not write {plugin_file} correctly")
         return 1
 
     version_file.write_text(
