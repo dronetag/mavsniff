@@ -1,23 +1,34 @@
-name: "RELEASE"
+name: "Release"
 
+# on workflow_dispatch means that you run it manually from "Actions" tab
+# if you want release to be done automatically then remove this file and
+# uncomment the bottom lines on build-and-test.yml workflow
 on:
   workflow_dispatch:
+  # if you want automatic releases upon push to the main branch simply uncomment following lines
+  # push:
+  #   branches:
+  #     - main
 
 env:
   PYTHON_VERSION: "3.10"
 
 jobs:
-  release:
-    name: Tag and Release
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository (full-depth)
-      uses: actions/checkout@v4
-      with: { fetch-depth: 0 } # Required to determine version
 
-    - name: Get semantic version
-      uses: dronetag/actions/semantic-release@main
-      id: semantic
+  build-and-test:
+    uses: ./.github/workflows/build-and-test.yml
+
+  release-python:
+    name: Publish version ${{needs.build-and-test.outputs.version}}
+    if: needs.build-and-test.outputs.prerelease == 'false'
+    runs-on: ubuntu-latest
+    needs: [build-and-test]
+    steps:
+    - name: Download built packages
+      uses: actions/download-artifact@v4
+      with:
+        name: dist
+        path: dist
 
     - name: Install the project
       uses: dronetag/gha-shared/.github/actions/poetry-install@master
@@ -28,20 +39,25 @@ jobs:
         private-pypi-pass: ${{ secrets.PRIV_PIP_PASSWORD }}
         python-version: "${{ env.PYTHON_VERSION }}"
 
-    - name: Build the project
-      run: |
-        poetry version "${{ steps.semantic.outputs.version }}"
-        poetry build
-
-    - name: Commit and tag
-      if: ${{ steps.semantic.outputs.existed == 'false' }}
-      uses: dronetag/actions/release@main
-      with:
-        github-token: ${{ github.token }}
-        changelog: ${{ steps.semantic.outputs.changelog }}
-        commit-changelog: true
-        version: ${{ steps.semantic.outputs.version }}
-
     - name: Publish package with poetry
       run: |
         poetry publish -n -r dronetag --skip-existing
+
+
+  release-git:
+    name: Release new version to git and github
+    if: needs.build-and-test.outputs.existed == 'false'
+    runs-on: ubuntu-latest
+    needs: [build-and-test]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create tag and release
+        uses: dronetag/actions/release@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          version: ${{ needs.build-and-test.outputs.version }}
+          changelog: ${{ needs.build-and-test.outputs.changelog }}
+          commit-changelog: true
+          tag-only: ${{ needs.build-and-test.outputs.prerelease }}

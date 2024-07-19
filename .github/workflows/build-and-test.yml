@@ -1,0 +1,107 @@
+name: Build and Test
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+  workflow_call:
+    outputs:
+      existed:
+        description: "String true|false describing previous existence of the version"
+        value: ${{ jobs.get-version.outputs.existed }}
+      version:
+        description: "New released version in form of X.Y.Z"
+        value: ${{ jobs.get-version.outputs.version }}
+      prerelease:
+        description: "String true|false whether the version is a pre-release"
+        value: ${{ jobs.get-version.outputs.prerelease }}
+      changelog:
+        description: "Changelog string in mardown format"
+        value: ${{ jobs.get-version.outputs.changelog }}
+
+env:
+  NODE_VERSION: '20'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+
+  get-version:
+    uses: ./.github/workflows/get-version.yml
+
+  build:
+    name: Build the package
+    runs-on: ubuntu-latest
+    needs: [get-version]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install the project
+        uses: dronetag/gha-shared/.github/actions/poetry-install@master
+        with:
+          python-version: "${{ env.PYTHON_VERSION }}"
+
+      - name: Run pro-commit checks
+        run: |
+          pip uninstall mavsniff
+          poetry install --no-interaction --no-root -E dev
+          pre-commit run --all-files
+
+      - name: Export version
+        run: poetry version ${{ needs.get-version.outputs.version }}
+
+      - name: Build package
+        run: poetry build
+
+      - name: Export built package
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/*
+
+  test:
+    needs: [build, get-version]
+    name: Run automated tests
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.get-version.outputs.version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download built package
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Install package
+        run: |
+          ls -alh dist/
+          pip install dist/*.whl
+
+      - name: Run tests with coverage
+        run: |
+          pip install pytest pytest-cov
+          pytest --cov | tee .pytest-coverage.txt; exit ${PIPESTATUS[0]}
+
+      - name: Create coverage comment (great for examining pull-requests)
+        id: coverage
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          pytest-coverage-path: .pytest-coverage.txt
+          create-new-comment: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create the Badge
+        if: needs.get-version.outputs.prerelease == 'false'
+        uses: schneegans/dynamic-badges-action@v1.6.0
+        with:
+          auth: ${{ secrets.GIST_UPDATE_TOKEN }}  # see README.md on how to obrain the gist token ...
+          gistID: bda1e64c276a6d6e6a4e65fb5dc9330b
+          filename: coverage.json
+          label: Test coverage
+          message: ${{ steps.coverage.outputs.coverage }}
+          color: ${{ steps.coverage.outputs.color }}
+          namedLogo: python
