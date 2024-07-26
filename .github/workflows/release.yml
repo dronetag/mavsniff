@@ -46,11 +46,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download built packages
-        uses: actions/download-artifact@v4
-        with:
-          name: version
-          path: mavsniff/__version__.py
+      - name: Export version to __version__.py
+        run: |
+          echo 'version="${{ needs.build-and-test.outputs.version }}"' | tee src/mavsniff/__version__.py
 
       - name: Create tag and release
         uses: dronetag/actions/release@main
@@ -60,4 +58,4 @@ jobs:
           changelog: ${{ needs.build-and-test.outputs.changelog }}
           commit-changelog: true
           tag-only: ${{ needs.build-and-test.outputs.prerelease }}
-          git-add: mavsniff/__version__.py
+          git-add: src/mavsniff/__version__.py

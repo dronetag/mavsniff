@@ -23,6 +23,7 @@ on:
 env:
   NODE_VERSION: '20'
   PYTHON_MIN_VERSION: '3.8'
+  PACKAGE_NAME: mavsniff
 
 jobs:
 
@@ -44,14 +45,7 @@ jobs:
 
       - name: Export version to __version__.py
         run: |
-          echo 'version="${{ needs.get-version.outputs.version }}"' | tee mavsniff/__version__.py
-          cat mavsniff/__version__.py
-
-      - name: Export built package
-        uses: actions/upload-artifact@v4
-        with:
-          name: version
-          path: mavsniff/__version__.py
+          echo 'version="${{ needs.get-version.outputs.version }}"' | tee src/${{env.PACKAGE_NAME}}/__version__.py
 
       - name: Build package
         run: |
@@ -105,9 +99,10 @@ jobs:
 
       - name: Create the Badge
         if: needs.get-version.outputs.prerelease == 'false'
+        continue-on-error: true
         uses: schneegans/dynamic-badges-action@v1.6.0
         with:
-          auth: ${{ secrets.GIST_UPDATE_TOKEN }}  # see README.md on how to obrain the gist token ...
+          auth: ${{ secrets.GIST_UPDATE_TOKEN }}  # see README.md on how to obrain the gist token
           gistID: bda1e64c276a6d6e6a4e65fb5dc9330b
           filename: coverage.json
           label: Test coverage

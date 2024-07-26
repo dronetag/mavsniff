@@ -4,6 +4,8 @@ import time
 from typing import IO, Any, Optional
 
 import pcapng
+import pcapng.blocks
+import pcapng.writer
 import serial
 from pymavlink import mavutil
 from pymavlink.generator import mavparse
@@ -17,7 +19,7 @@ class Capture:
 
     file: IO[bytes]
     device: mavutil.mavfile
-    writer: Optional[pcapng.FileWriter]
+    writer: Optional[pcapng.writer.FileWriter]
     done: bool
     sbh: pcapng.blocks.SectionHeader
 
@@ -76,7 +78,7 @@ class Capture:
         if self.writer is not None:
             raise RuntimeError("Called run method twice")
 
-        self.writer = pcapng.FileWriter(self.file, self.sbh)
+        self.writer = pcapng.writer.FileWriter(self.file, self.sbh)
         self.done = False
 
         threading.Thread(target=self.report_stats).start()

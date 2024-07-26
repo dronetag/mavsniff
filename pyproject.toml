@@ -47,9 +47,10 @@ dev = [
 follow_imports = "skip"
 
 [tool.coverage.run]
+source = ["src"]
 omit = [
-  "mavsniff/__main__.py",
-  "mavsniff/commands/*",
+  "src/mavsniff/__main__.py",
+  "src/mavsniff/commands/*",
 ]
 
 [tool.ruff]
@@ -69,6 +70,6 @@ line-ending = "auto"
 [tool.pyright]
 # we use pyright for type checking because it is built into VScode. Preferably in
 # strict mode. You can omit single lines in code by adding # type: ignore
-include = ["mavsniff"]
+include = ["src"]
 typeCheckingMode = "strict"
 pythonVersion = "3.8"  # might be good idea to set minimal python version

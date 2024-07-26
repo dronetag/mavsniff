@@ -4,6 +4,7 @@ import time
 from typing import Any, Optional
 
 import pcapng  # type: ignore[import-untyped]
+import pcapng.scanner  # type: ignore[import-untyped]
 from pymavlink import mavutil  # type: ignore[import-untyped]
 
 from mavsniff.utils import ip
@@ -24,9 +25,9 @@ class Replay:
         self.device = device
         self.done = False
 
-    def run(self, limit=-1) -> int:
+    def run(self, limit: int = -1) -> int:
         """Replay a PCAPNG file to a device"""
-        scanner = pcapng.FileScanner(self.file)
+        scanner = pcapng.scanner.FileScanner(self.file)
         # Resolution is handled in the mavlink library - timestamp is in seconds
         # resolution seems to be constant for all packets in a file
         # self.resolution_ts = interface_description.timestamp_resolution
