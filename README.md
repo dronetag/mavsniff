@@ -9,7 +9,7 @@ You can read from a serial line (_/dev/ttyXXX or COMx_) or even from network (TC
 
 ## Installation
 
-```pip install git+https://github.com/dronetag/mavsniff.git@v1.1.2```
+```pip install git+https://github.com/dronetag/mavsniff.git@v1.1.3```
 
 If you are running mavsniff on WSL then you need a tool for forwarding USBs to Linux.
 For that, WSL uses _usbip_ on Linux side `sudo apt install usbip`
