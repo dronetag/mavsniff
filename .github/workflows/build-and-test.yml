@@ -22,7 +22,7 @@ on:
 
 env:
   NODE_VERSION: '20'
-  PYTHON_VERSION: '3.11'
+  PYTHON_MIN_VERSION: '3.8'
 
 jobs:
 
@@ -37,22 +37,31 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install the project
-        uses: dronetag/gha-shared/.github/actions/poetry-install@master
+      - name: Set up Python ${{ env.PYTHON_MIN_VERSION }}
+        uses: actions/setup-python@v5
         with:
-          python-version: "${{ env.PYTHON_VERSION }}"
+          python-version: ${{ env.PYTHON_MIN_VERSION }}
 
-      - name: Run pro-commit checks
+      - name: Export version to __version__.py
         run: |
-          pip uninstall mavsniff
-          poetry install --no-interaction --no-root -E dev
-          pre-commit run --all-files
+          echo 'version="${{ needs.get-version.outputs.version }}"' | tee mavsniff/__version__.py
+          cat mavsniff/__version__.py
 
-      - name: Export version
-        run: poetry version ${{ needs.get-version.outputs.version }}
+      - name: Export built package
+        uses: actions/upload-artifact@v4
+        with:
+          name: version
+          path: mavsniff/__version__.py
 
       - name: Build package
-        run: poetry build
+        run: |
+          pip install --upgrade build
+          python -m build
+
+      - name: Run pre-commit checks
+        run: |
+          PACKAGE=$(find dist/ -name '*whl')
+          pip install $PACKAGE[dev]
 
       - name: Export built package
         uses: actions/upload-artifact@v4

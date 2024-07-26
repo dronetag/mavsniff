@@ -3,7 +3,11 @@
         "ardupilotmega",
         "disector",
         "hwid",
+        "mavconn",
         "mavsniff",
+        "mavutil",
+        "pcapng",
+        "pymavlink",
         "wireshark",
         "wsplugin"
     ]

@@ -14,22 +14,19 @@ repos:
     hooks:
     - id: ruff
       name: Ruff
-      entry: poetry run ruff check --fix
+      entry: ruff check --fix
       language: system
       types: [python]
-      stages: ["pre-commit"]
     - id: ruff-format
       name: Ruff format
-      entry: poetry run ruff format
+      entry: ruff format
       language: system
       types: [python]
-      stages: ["pre-commit"]
     - id: mypy
       name: mypy
-      entry: poetry run mypy --exclude tests --ignore-missing-imports --follow-imports=skip --pretty
+      entry: mypy --exclude tests --ignore-missing-imports --follow-imports=skip --pretty
       language: system
       types: [python]
-      stages: ["pre-commit"]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0

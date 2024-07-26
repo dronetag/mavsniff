@@ -10,16 +10,14 @@ on:
   #   branches:
   #     - main
 
-env:
-  PYTHON_VERSION: "3.10"
-
 jobs:
 
   build-and-test:
     uses: ./.github/workflows/build-and-test.yml
 
+
   release-python:
-    name: Publish version ${{needs.build-and-test.outputs.version}}
+    name: Publish python package to pypi
     if: needs.build-and-test.outputs.prerelease == 'false'
     runs-on: ubuntu-latest
     needs: [build-and-test]
@@ -30,18 +28,13 @@ jobs:
         name: dist
         path: dist
 
-    - name: Install the project
-      uses: dronetag/gha-shared/.github/actions/poetry-install@master
+    - name: Publish the package
+      uses: dronetag/actions/release-python@main
       with:
-        private-pypi-name: dronetag
-        private-pypi-host: ${{ secrets.PRIV_PIP_HOST }}
-        private-pypi-user: ${{ secrets.PRIV_PIP_USER }}
-        private-pypi-pass: ${{ secrets.PRIV_PIP_PASSWORD }}
-        python-version: "${{ env.PYTHON_VERSION }}"
-
-    - name: Publish package with poetry
-      run: |
-        poetry publish -n -r dronetag --skip-existing
+        pypi-name: dronetag
+        pypi-host: ${{ secrets.PRIV_PIP_HOST }}
+        pypi-user: ${{ secrets.PRIV_PIP_USER }}
+        pypi-pass: ${{ secrets.PRIV_PIP_PASSWORD }}
 
 
   release-git:
@@ -53,6 +46,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Download built packages
+        uses: actions/download-artifact@v4
+        with:
+          name: version
+          path: mavsniff/__version__.py
+
       - name: Create tag and release
         uses: dronetag/actions/release@main
         with:
@@ -61,3 +60,4 @@ jobs:
           changelog: ${{ needs.build-and-test.outputs.changelog }}
           commit-changelog: true
           tag-only: ${{ needs.build-and-test.outputs.prerelease }}
+          git-add: mavsniff/__version__.py

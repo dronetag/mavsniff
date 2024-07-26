@@ -1,36 +1,47 @@
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools >= 59.0"]  # other build dependencies e.g. "mypy-protobuf >= 3.0.0"
+build-backend = "setuptools.build_meta"
 
-[tool.poetry]
+[project]
 name = "mavsniff"
-version = "1.0.0"
-repository = "https://github.com/dronetag/mavsniff"
+requires-python = ">=3.8"
 authors = [
-  "Tomas Peterka <tomas.peterka@dronetag.cz>",
+   {name = "Tomas Peterka", email="tomas.peterka@dronetag.cz"}
 ]
 description = "Mavsniff enables you to capture and replay MAVLink communication over serial line or network"
-readme = "README.md"
-license = "MIT"
+license.text = "MIT"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+dependencies=[
+  "click",
+  "pymavlink ==2.4.20",
+  "pyserial ==3.5",
+  "python-pcapng ==2.1.1",
+]
+dynamic = ["version", "readme"]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-click = "*"
-pymavlink = "^2.4.20"
-pyserial = "^3.5"
-python-pcapng = "^2.1.1"
-wheel = {version="*", optional=true}
+[tool.setuptools.dynamic]
+version = {attr = "mavsniff.__version__.version"}
+readme = {file = ["README.md"]}
 
-[tool.poetry.scripts]
+[project.urls]
+Homepage = "https://github.com/dronetag/mavsniff"
+
+[project.scripts]
 mavsniff = "mavsniff:__main__"
 
-[tool.poetry.extras]
-dev = ["wheel", "pytest", "pytest-cov", "mypy", "ruff", "pre-commit"]
+[project.optional-dependencies]
+dev = [
+  "wheel",
+  "pytest",
+  "pytest-cov",
+  "mypy",
+  "ruff",
+  "pre-commit",
+]
 
 [tool.mypy]
 follow_imports = "skip"
@@ -54,3 +65,10 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+
+[tool.pyright]
+# we use pyright for type checking because it is built into VScode. Preferably in
+# strict mode. You can omit single lines in code by adding # type: ignore
+include = ["mavsniff"]
+typeCheckingMode = "strict"
+pythonVersion = "3.8"  # might be good idea to set minimal python version

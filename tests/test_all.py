@@ -3,14 +3,16 @@ import threading
 import time
 from typing import IO
 
-import pcapng
-from pymavlink import mavutil
-from pymavlink.dialects.v20 import ardupilotmega as mavlink2
+import pcapng  # type: ignore[import-untyped]
+import pcapng.blocks  # type: ignore[import-untyped]
+import pcapng.scanner  # type: ignore[import-untyped]
+from pymavlink import mavutil  # type: ignore[import-untyped]
+from pymavlink.dialects.v20 import ardupilotmega as mavlink2  # type: ignore[import-untyped]
 
 from mavsniff.capture import Capture
 from mavsniff.replay import Replay
 from mavsniff.utils import ip
-from mavsniff.utils.mav import mavlink
+from mavsniff.utils.mav import mavlink  # type: ignore[import-untyped]
 
 TEST_DEVICE_URL = "tcp://localhost:3728"
 
@@ -52,7 +54,7 @@ def test_capture_timing():
 
     # step 2: read the in-memory file and check that the timing of packets is saved correctly
     buffer.seek(0)
-    packets = list(pcapng.FileScanner(buffer))
+    packets = list(pcapng.scanner.FileScanner(buffer))
 
     assert len(packets) == 2 + 4  # 2 section headers, 4 packets
     assert isinstance(packets[0], pcapng.blocks.SectionHeader)
@@ -152,7 +154,7 @@ def test_capture_garbage():
 
     # step 2: read the in-memory file and check that the timing of packets is saved correctly
     buffer.seek(0)
-    packets = list(pcapng.FileScanner(buffer))
+    packets = list(pcapng.scanner.FileScanner(buffer))
 
     # assert len(packets) == 2+4 # 2 section headers, 4 packets
     assert isinstance(packets[0], pcapng.blocks.SectionHeader)
