@@ -1,5 +1,6 @@
 import logging
 import signal
+import sys
 
 import click
 
@@ -79,6 +80,8 @@ def capture(
     signal.signal(signal.SIGINT, capture.stop)
 
     try:
+        if limit < 0:
+            print("Capturing without packets limit - use ctrl+c to stop", file=sys.stderr)
         captured = capture.run(limit=limit)
         logger.info(f"captured {captured} valid MAVLink packets")
         return 0
