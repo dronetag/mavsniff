@@ -59,6 +59,9 @@ $ mavsniff capture --device COM67 --file recording --baud=57600 # for serial lin
 $ mavsniff replay -f recording -d udp://localhost:12250 --mavlink-dialect path-to-custom/my-dialect.xml
 ```
 
+**Mavsniff never ends! Even if it finished processing your file it will keep waiting for more input. Simply kill it with ctrl+c.**
+
+
 ### Inspect with [Wireshark](https://www.wireshark.org/download.html).
 
 Wireshark doesn't know MAVLink packets by default. It needs MAVLink dissector in form of
