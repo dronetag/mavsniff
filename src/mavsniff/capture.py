@@ -106,6 +106,10 @@ class Capture:
             except serial.SerialException:
                 logger.info("serial line closed")
                 break
+            except Exception as e:
+                logger.warning("Message type not recognized. Most likely wrong dialect")
+                logger.debug(e, exc_info=True)
+                self.parse_errors += 1
         self.device.close()
         return self.received
 
