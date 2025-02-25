@@ -1,3 +1,12 @@
+## 1.1.4 (https://github.com/dronetag/mavsniff/compare/v1.1.3...v1.1.4) (2025-02-25)
+
+### Bug Fixes
+
+    * Add message about stoppping unlimited capture ddf19ee
+    * Do not crash on parsing unknown message c937fb0
+    * new pymavlink does not export version e95ad18
+
+
 ## 1.1.3 (https://github.com/dronetag/mavsniff/compare/v1.1.2...v1.1.3) (2024-07-26)
 
 ### Bug Fixes
