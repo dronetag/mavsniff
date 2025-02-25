@@ -110,7 +110,7 @@ def wsplugin(
         return 1
 
     version_file.write_text(
-        f"""Pymavlink version: {pymavlink.__version__}
+        f"""Pymavlink version: {getattr(pymavlink, '__version__', 'too-new')}
 Built at: {datetime.now()}
 Dialects: {dialects}
 """
