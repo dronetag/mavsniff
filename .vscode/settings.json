@@ -6,6 +6,7 @@
         "mavconn",
         "mavsniff",
         "mavutil",
+        "netcat",
         "pcapng",
         "pymavlink",
         "wireshark",

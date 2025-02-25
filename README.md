@@ -52,7 +52,7 @@ compatible with latest WireShark
  * `-d /dev/ttyS0` - standard serial port on UNIX systems
  * `-d COMx` - from COM1 to COM99 - standard serial ports on Windows systems
  * `-d udp://<host>:<port>` or `tcp://<host>:<port>` - receive or send packets over network (TCP or UDP)
- * `-d file.tlog` - almost any (at least a bit standard) binary or textual file can be replayed
+ * `-d file` - expected APM DataFlash log or a CSV - decided by suffix
 
 ```bash
 $ mavsniff capture --device COM67 --file recording --baud=57600 # for serial line, specify baud if different from 115200
@@ -61,6 +61,18 @@ $ mavsniff replay -f recording -d udp://localhost:12250 --mavlink-dialect path-t
 
 **Mavsniff never ends! Even if it finished processing your file it will keep waiting for more input. Simply kill it with ctrl+c.**
 
+#### Capturing raw serial dump
+
+If you find yourself in a situation with only a raw serial recording, despair not. The easiest is to use `netcat`
+and send it to `mavsniff` via tcp/udp. First, start the capture in one terminal
+
+```sh
+mavsniff capture -d udp:127.0.0.1:8088 -f your-raw-dump.bin.pcapng
+```
+second, replay your file with `netcat` over UDP to the port where mavsniff is listening
+```sh
+cat your-raw-dump.bin | nc -cu 127.0.0.1 8088
+```
 
 ### Inspect with [Wireshark](https://www.wireshark.org/download.html).
 
