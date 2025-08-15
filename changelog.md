@@ -1,3 +1,10 @@
+## 1.1.5 (https://github.com/dronetag/mavsniff/compare/v1.1.4...v1.1.5) (2025-08-15)
+
+### Bug Fixes
+
+    * Bumping version of pymavlink blocking installation on newer python 2cf5008
+
+
 ## 1.1.4 (https://github.com/dronetag/mavsniff/compare/v1.1.3...v1.1.4) (2025-02-25)
 
 ### Bug Fixes
