@@ -65,9 +65,9 @@ class Replay:
                 empty += 1
                 continue
             if packet.packet_data[0] in (
-                0xFE,
-                0xFD,
-            ):  # mavlink magic bytes (0xfe "v1.0", 0xfd "v2.0")
+                0xFE, # Mavlink v1.0
+                0xFD, # Mavlink v2.0
+            ):
                 sleep_time += self._send_in_timely_manner(packet.timestamp, packet.packet_data)
             elif ip.is_packet(packet.packet_data):
                 sleep_time += self._send_in_timely_manner(
@@ -75,7 +75,7 @@ class Replay:
                 )
             else:
                 non_data += 1
-                logger.debug(f"unknown packet: {packet.packet_data[:10]}...")
+                logger.debug("unknown packet: %s...", packet.packet_data[:10])
                 continue
             written += 1
             if limit > 0 and written >= limit:
@@ -85,11 +85,16 @@ class Replay:
 
     def _send_in_timely_manner(self, timestamp: float, packet_data: bytes) -> float:
         """Replay a packet to the device"""
+        if not packet_data or packet_data[0] not in (0xFE, 0xFD):
+            logger.warning("Not sending data %s... because they aren't mavlink", packet_data[:10])
+            return 0.0
+
         packet_ts_delta: float = timestamp - self.last_packet_ts
         since_last_sent: float = time.time() - self.last_sent_ts
         sleep_time = packet_ts_delta - since_last_sent
         if sleep_time > 0.00001:
             time.sleep(sleep_time)
+
         self.device.write(packet_data)
         self.last_sent_ts = time.time()
         self.last_packet_ts = timestamp
