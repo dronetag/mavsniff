@@ -1,3 +1,10 @@
+## 1.1.6 (https://github.com/dronetag/mavsniff/compare/v1.1.5...v1.1.6) (2025-09-29)
+
+### Bug Fixes
+
+    * replay: Parse IPv4 packets better c63cebb
+
+
 ## 1.1.5 (https://github.com/dronetag/mavsniff/compare/v1.1.4...v1.1.5) (2025-08-15)
 
 ### Bug Fixes
